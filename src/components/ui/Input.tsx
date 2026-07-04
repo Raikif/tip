@@ -21,14 +21,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           id={inputId}
           ref={ref}
           className={`
-            flex h-11 w-full rounded-xl border bg-white/50 px-3 py-2 text-sm
+            flex h-12 w-full rounded-xl border-2 bg-white px-4 py-2 text-sm text-slate-900 shadow-sm
             file:border-0 file:bg-transparent file:text-sm file:font-medium
             placeholder:text-slate-400
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-purple)] focus-visible:border-transparent
+            focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--color-brand-purple)]/20 focus-visible:border-[var(--color-brand-purple)]
             disabled:cursor-not-allowed disabled:opacity-50
-            dark:bg-slate-900/50 dark:text-slate-50 dark:border-slate-700
-            backdrop-blur-sm transition-all
-            ${error ? "border-red-500 focus-visible:ring-red-500" : "border-slate-300 dark:border-slate-700"}
+            dark:bg-slate-900 dark:text-white dark:border-slate-600
+            transition-all
+            ${error ? "border-red-500 focus-visible:ring-red-500" : "border-slate-300 dark:border-slate-600 hover:border-slate-400"}
             ${className}
           `}
           {...props}
