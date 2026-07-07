@@ -22,6 +22,11 @@ body {
   padding: 0;
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Base styles for the full screen sections */
 .panel {
   position: relative;
