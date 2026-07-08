@@ -23,7 +23,7 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 h-20 glass-nav z-50 flex items-center justify-between px-6 md:px-12">
       <div className="flex items-center gap-4">
         <span className="font-bold text-xl tracking-tight text-[var(--color-brand-purple)]">
-          TIP 2026
+          TxC 2026
         </span>
       </div>
 

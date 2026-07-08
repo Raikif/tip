@@ -36,7 +36,7 @@ export default function SuccessPage() {
               <ul className="space-y-3">
                 <li className="flex items-center justify-between text-sm">
                   <span className="text-slate-500">ID Pendaftaran</span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">TIP-26-08492</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200">TxC-26-08492</span>
                 </li>
                 <li className="flex items-center justify-between text-sm">
                   <span className="text-slate-500">Kategori Lomba</span>

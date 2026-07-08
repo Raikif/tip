@@ -53,7 +53,7 @@ export default function AboutUsSection() {
             Tentang Kami
           </h2>
           <p className="text-slate-700 max-w-2xl mx-auto">
-            Tech Innovation Paper (TIP) 2026 diselenggarakan melalui kolaborasi luar biasa.
+            Tech Innovation Paper (TxC) 2026 diselenggarakan melalui kolaborasi luar biasa.
           </p>
         </div>
 

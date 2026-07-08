@@ -76,7 +76,7 @@ export default function TimelineSection() {
               Timeline Kegiatan
             </h2>
             <p className="text-slate-700 max-w-2xl mx-auto mb-8 font-medium">
-              Catat tanggal-tanggal penting ini dan jangan sampai terlewatkan kesempatanmu untuk menjadi juara di TIP 2026.
+              Catat tanggal-tanggal penting ini dan jangan sampai terlewatkan kesempatanmu untuk menjadi juara di TxC 2026.
             </p>
 
             <div ref={tabsRef} className="flex justify-center gap-4">
