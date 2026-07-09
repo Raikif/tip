@@ -105,7 +105,7 @@ export default function RegistrationPage() {
         return;
       }
     }
-    
+
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     }
@@ -198,7 +198,7 @@ export default function RegistrationPage() {
         <Link href="/">
           <Button className="mt-8">Kembali ke Beranda</Button>
         </Link>
-        <button 
+        <button
           onClick={() => { localStorage.setItem("debug_time_bypass", "true"); window.location.reload(); }}
           className="mt-12 text-xs text-slate-400 hover:text-slate-600"
         >
@@ -222,7 +222,7 @@ export default function RegistrationPage() {
   return (
     <div className="min-h-screen pt-28 pb-12 px-4 md:px-8 relative">
       <div className="max-w-4xl mx-auto relative z-10">
-        
+
         {/* Header Steps */}
         <div className="mb-6 relative z-10">
           <Link href="/" className="text-white/90 font-medium hover:text-white hover:underline text-sm flex items-center gap-1 drop-shadow-md">
@@ -231,7 +231,7 @@ export default function RegistrationPage() {
         </div>
 
         <div className="max-w-3xl mx-auto bg-white/10 backdrop-blur-3xl rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-white/20 overflow-hidden relative z-10">
-        
+
         {/* Header Area */}
         <div className="bg-white/5 px-8 py-10 text-white relative border-b border-white/10">
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
@@ -241,15 +241,15 @@ export default function RegistrationPage() {
           <h1 className="text-3xl md:text-4xl font-black relative z-10 drop-shadow-md text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-100 to-yellow-400 pb-1">
             {currentStep <= steps.length ? steps[currentStep - 1].title : "Pendaftaran Berhasil"}
           </h1>
-          
+
           <div className="flex items-center gap-2 mt-8 relative z-10">
             {steps.map((step) => (
               <React.Fragment key={step.id}>
-                <div 
+                <div
                   className={`flex items-center justify-center w-12 h-12 rounded-[1.2rem] font-bold text-sm transition-all duration-300 shadow-sm ${
-                    step.id === currentStep 
-                      ? "bg-white/20 text-white border border-white/30 backdrop-blur-md scale-110 shadow-inner" 
-                      : step.id < currentStep 
+                    step.id === currentStep
+                      ? "bg-white/20 text-white border border-white/30 backdrop-blur-md scale-110 shadow-inner"
+                      : step.id < currentStep
                         ? "bg-white/10 text-white/50 border border-white/10"
                         : "bg-black/10 text-white/30 border border-white/5"
                   }`}
@@ -272,17 +272,17 @@ export default function RegistrationPage() {
                 <Info className="text-orange-300 shrink-0 mt-0.5" size={20} />
                 <p className="font-medium drop-shadow-sm">Pastikan data yang diisi sudah benar. Semua pengumpulan karya/abstrak akan dilakukan di Dashboard setelah pendaftaran selesai.</p>
               </div>
-              
+
               <div className="w-full flex flex-col gap-1.5">
                 <label className="text-sm font-bold text-white drop-shadow-sm">Kategori Lomba <span className="text-red-500">*</span></label>
-                <select 
+                <select
                   name="category"
                   className="flex h-12 w-full rounded-[0.8rem] border border-white/20 bg-white/10 backdrop-blur-md px-5 py-2 text-sm text-white shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/20 focus-visible:border-white/40 hover:border-white/30 transition-all cursor-pointer [&>option]:text-slate-900"
                   value={formData.category}
                   onChange={handleChange}
                   required
                 >
-                  <option value="">-- Pilih Kategori Lomba --</option>
+                  <option value="" disabled>-- Pilih Kategori Lomba --</option>
                   <option value="lkti">Karya Tulis Ilmiah (Mahasiswa)</option>
                   <option value="essay">Essay (Mahasiswa)</option>
                   <option value="poster">Desain Poster (SMA/Sederajat)</option>
@@ -440,7 +440,7 @@ export default function RegistrationPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="border border-dashed border-white/40 bg-white/5 rounded-[1.5rem] p-12 text-center hover:bg-white/15 hover:border-white/60 transition-all duration-300 cursor-pointer group shadow-sm backdrop-blur-md">
                 <div className="w-20 h-20 bg-white/20 text-white border border-white/30 rounded-[1.2rem] flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:-rotate-3 transition-transform shadow-inner">
                   <FileImage size={36} />
@@ -484,30 +484,30 @@ export default function RegistrationPage() {
               {error}
             </div>
           )}
-          
+
           {currentStep < 4 && (
             <div className="flex flex-col-reverse sm:flex-row gap-4 mt-8 pt-8 border-t border-white/10 relative z-10">
               {currentStep > 1 && (
-                <Button 
+                <Button
                   type="button"
-                  variant="outline" 
-                  onClick={handlePrev} 
+                  variant="outline"
+                  onClick={handlePrev}
                   className="flex-1 py-4 text-base border border-white/20 bg-white/5 text-white/90 hover:bg-white/10 hover:text-white font-bold rounded-[1.2rem] backdrop-blur-sm transition-all shadow-sm"
                 >
                   Kembali
                 </Button>
               )}
               {currentStep < steps.length ? (
-                <Button 
+                <Button
                   type="button"
-                  onClick={handleNext} 
+                  onClick={handleNext}
                   className="flex-1 py-4 text-base flex items-center justify-center gap-2 bg-white/20 border border-white/40 shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:-translate-y-1 hover:bg-white/30 text-white font-bold rounded-[1.2rem] backdrop-blur-md transition-all"
                 >
                   Selanjutnya
                   <ChevronRight size={20} />
                 </Button>
               ) : (
-                <Button 
+                <Button
                   type="submit"
                   disabled={isLoading}
                   className="flex-1 py-4 text-base flex items-center justify-center gap-2 bg-white/20 border border-white/40 shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:-translate-y-1 hover:bg-white/30 text-white font-bold rounded-[1.2rem] backdrop-blur-md transition-all"
