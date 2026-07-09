@@ -1,6 +1,4 @@
-import React from 'react';
-import { Button } from 'antd';
-import './HeroLanding.less';
+import React from "react";
 
 const HeroLanding: React.FC = () => {
   return (
@@ -28,7 +26,9 @@ const HeroLanding: React.FC = () => {
 
       {/* 中央纽扣图标 */}
       <div className="button-icon">
-        <Button type="primary" shape="circle" size="large" icon={<span className="button-dot">●</span>} />
+        <button type="button" className="hero-landing-button" aria-label="Hero button">
+          <span className="button-dot">●</span>
+        </button>
       </div>
     </div>
   );

@@ -7,9 +7,10 @@ import { Home, FileText, User } from "lucide-react";
 
 export const Navigation = () => {
   const pathname = usePathname();
+  const safePathname = pathname ?? "";
 
   // Hide navigation on landing page and login page
-  if (pathname === "/" || pathname === "/login") {
+  if (safePathname === "/" || safePathname === "/login") {
     return null;
   }
 
@@ -29,7 +30,9 @@ export const Navigation = () => {
         </Link>
         <div className="flex items-center gap-2">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href === '/dashboard' && pathname.startsWith('/dashboard'));
+            const isActive =
+              safePathname === item.href ||
+              (item.href === "/dashboard" && safePathname.startsWith("/dashboard"));
             const Icon = item.icon;
             return (
               <Link
@@ -52,7 +55,9 @@ export const Navigation = () => {
       {/* Bottom Navbar for Mobile */}
       <nav className="md:hidden fixed bottom-6 left-4 right-4 h-16 bg-white/10 backdrop-blur-2xl border border-white/20 z-50 flex items-center justify-around px-2 rounded-[1.5rem] shadow-[0_10px_30px_rgba(0,0,0,0.15)] animate-entrance">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href === '/dashboard' && pathname.startsWith('/dashboard'));
+          const isActive =
+            safePathname === item.href ||
+            (item.href === "/dashboard" && safePathname.startsWith("/dashboard"));
           const Icon = item.icon;
           return (
             <Link
