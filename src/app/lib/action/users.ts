@@ -42,7 +42,7 @@ export async function getUsers() {
   const snapshot = await db.ref("users").once("value");
   const data = snapshot.val() as Record<
     string,
-    { email: string; password: string; name: string; role: string; createdAt: string }
+    { email: string; password: string; name: string; role: UserRole; createdAt: string }
   > | null;
   if (!data) return [];
   return Object.entries(data).map(([id, u]) => ({
@@ -102,7 +102,7 @@ export async function getAllTeams() {
 
   const db = getFirebaseAdminDb();
   const snapshot = await db.ref("peserta").once("value");
-  const data = snapshot.val() as Record<string, Record<string, unknown>> | null;
+  const data = snapshot.val() as Record<string, { teamName?: string; status?: string; category?: string }> | null;
   if (!data) return [];
   return Object.entries(data).map(([teamName, team]) => ({
     teamName,

@@ -4,6 +4,9 @@ export interface EventStage {
   time?: number;
   label: string;
   order?: number;
+  startsAt?: string;
+  endsAt?: string;
+  countdownTitle?: string;
 }
 
 export interface EventCategory {

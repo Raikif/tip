@@ -1,8 +1,8 @@
 "use client";
 
 import HeroSection from "@/app/(utils)/components/sections/HeroSection";
-import TimelineSection from "@/app/(utils)/components/sections/TimelineSection";
-import CompetitionSection from "@/app/(utils)/components/sections/CompetitionSection";
+import TimelineSection from "@/components/sections/TimelineSection";
+import CompetitionSection from "@/components/sections/CompetitionSection";
 import AboutUsSection from "@/app/(utils)/components/sections/AboutUsSection";
 import SmoothScrollProvider from "@/app/(utils)/components/providers/SmoothScrollProvider";
 import AnimatedSection from "@/app/(utils)/components/providers/AnimatedSection";
@@ -154,10 +154,14 @@ export default function LandingPage() {
             </svg>
           </div>
 
-          <TimelineSection />
           <AnimatedSection type="up" duration={0.9}>
             <CompetitionSection />
           </AnimatedSection>
+
+          <div className="mt-16 sm:mt-24">
+            <TimelineSection />
+          </div>
+
           <AnimatedSection type="up" duration={0.9} delay={0.15}>
             <AboutUsSection />
           </AnimatedSection>

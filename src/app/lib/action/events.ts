@@ -23,6 +23,9 @@ export async function getEventTimeline(): Promise<EventTimeline> {
           time: stageData.time ?? undefined,
           label: stageData.label ?? stageKey,
           order: stageData.order ?? undefined,
+          startsAt: stageData.startsAt ?? undefined,
+          endsAt: stageData.endsAt ?? undefined,
+          countdownTitle: stageData.countdownTitle ?? undefined,
         };
       }
     }

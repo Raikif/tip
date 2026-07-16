@@ -4,7 +4,7 @@ import { useRef, useEffect } from "react";
 import { FaGraduationCap, FaPaintBrush } from "react-icons/fa";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGsapAnimation } from "../../hooks/useGsapAnimation";
+import { useGsapAnimation } from "@/app/(utils)/hooks/useGsapAnimation";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -44,7 +44,7 @@ export default function CompetitionSection() {
 
   return (
     <section id="competition" className="panel items-center justify-center">
-      <div className="max-w-6xl mx-auto px-6 w-full flex flex-col justify-center h-full pt-16">
+      <div className="max-w-6xl mx-auto px-6 w-full flex flex-col justify-center h-full pt-100">
         <div ref={headerRef} className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
             Kategori Kompetisi
