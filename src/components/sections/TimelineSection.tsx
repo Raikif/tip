@@ -483,22 +483,22 @@ export default function TimelineSection() {
     {
       id: "days",
       value: remaining.days,
-      label: "Days",
+      label: "Hari",
     },
     {
       id: "hours",
       value: remaining.hours,
-      label: "Hours",
+      label: "Jam",
     },
     {
       id: "minutes",
       value: remaining.minutes,
-      label: "Minutes",
+      label: "Menit",
     },
     {
       id: "seconds",
       value: remaining.seconds,
-      label: "Seconds",
+      label: "Detik",
     },
   ];
 

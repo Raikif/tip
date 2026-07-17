@@ -2,6 +2,7 @@
 
 import HeroSection from "@/app/(utils)/components/sections/HeroSection";
 import TimelineSection from "@/components/sections/TimelineSection";
+import EventsSection from "@/components/sections/EventsSection";
 import CompetitionSection from "@/components/sections/CompetitionSection";
 import AboutUsSection from "@/app/(utils)/components/sections/AboutUsSection";
 import SmoothScrollProvider from "@/app/(utils)/components/providers/SmoothScrollProvider";
@@ -162,9 +163,15 @@ export default function LandingPage() {
             <TimelineSection />
           </div>
 
-          <AnimatedSection type="up" duration={0.9} delay={0.15}>
-            <AboutUsSection />
+          <AnimatedSection type="up" duration={0.9}>
+            <EventsSection />
           </AnimatedSection>
+
+          <div className="mt-16 sm:mt-24">
+            <AnimatedSection type="up" duration={0.9} delay={0.15}>
+              <AboutUsSection />
+            </AnimatedSection>
+          </div>
         </div>
       </AnimatedSection>
     </SmoothScrollProvider>
