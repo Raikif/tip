@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat, Poppins, Anton } from "next/font/google";
 import "./globals.css";
-import { AnimatedBackground } from "./(utils)/components/layout/AnimatedBackground";
+import { GlobalBackground } from "./(utils)/components/layout/GlobalBackground";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -33,9 +33,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" className={`${montserrat.variable} ${poppins.variable} ${anton.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-white text-slate-900">
-        <AnimatedBackground />
-        {children}
+      <body className="min-h-full flex flex-col text-slate-900">
+        <GlobalBackground>
+          {children}
+        </GlobalBackground>
       </body>
     </html>
   );

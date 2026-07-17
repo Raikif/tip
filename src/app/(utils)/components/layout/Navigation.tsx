@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, FileText, User } from "lucide-react";
+import { Home, FileText, User, HelpCircle } from "lucide-react";
 
 export const Navigation = () => {
   const pathname = usePathname();
@@ -17,6 +17,7 @@ export const Navigation = () => {
   const navItems = [
     { label: "Beranda", href: "/dashboard", icon: Home },
     { label: "Pendaftaran", href: "/pendaftaran", icon: FileText },
+    { label: "FAQ", href: "/faq", icon: HelpCircle },
     { label: "Profil", href: "/login", icon: User },
   ];
 

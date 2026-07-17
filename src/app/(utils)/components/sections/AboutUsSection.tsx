@@ -252,53 +252,51 @@ function OrganizationFrame({ frame }: OrganizationFrameProps) {
         {frame.title}
       </motion.h2>
 
-      <div className={styles.organizationFrameContent}>
-        <motion.div
-          className={styles.organizationFrameLogoWrapper}
-          initial={{
-            opacity: 0,
-            scale: 1.15,
-            filter: "blur(10px)",
-          }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-            filter: "blur(0px)",
-          }}
-          transition={{
-            duration: 0.6,
-            delay: 0.15,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-        >
-          <img
-            src={frame.logo}
-            alt={frame.logoAlt}
-            className={styles.organizationFrameLogo}
-          />
-        </motion.div>
+      <motion.div
+        className={styles.organizationFrameLogoWrapper}
+        initial={{
+          opacity: 0,
+          scale: 1.15,
+          filter: "blur(10px)",
+        }}
+        animate={{
+          opacity: 1,
+          scale: 1,
+          filter: "blur(0px)",
+        }}
+        transition={{
+          duration: 0.6,
+          delay: 0.15,
+          ease: [0.22, 1, 0.36, 1],
+        }}
+      >
+        <img
+          src={frame.logo}
+          alt={frame.logoAlt}
+          className={styles.organizationFrameLogo}
+        />
+      </motion.div>
 
-        <motion.p
-          className={styles.organizationFrameDescription}
-          initial={{
-            opacity: 0,
-            y: 25,
-            filter: "blur(8px)",
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            filter: "blur(0px)",
-          }}
-          transition={{
-            duration: 0.65,
-            delay: 0.25,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-        >
-          {frame.description}
-        </motion.p>
-      </div>
+      <motion.p
+        className={styles.organizationFrameDescription}
+        initial={{
+          opacity: 0,
+          y: 25,
+          filter: "blur(8px)",
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+        }}
+        transition={{
+          duration: 0.65,
+          delay: 0.25,
+          ease: [0.22, 1, 0.36, 1],
+        }}
+      >
+        {frame.description}
+      </motion.p>
     </div>
   );
 }
