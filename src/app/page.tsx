@@ -14,9 +14,9 @@ export default function LandingPage() {
     <SmoothScrollProvider>
       <HeroSection />
       <AnimatedSection type="up" id="timeline-wrapper">
-          <div
-            className="relative w-full pb-16"
-            style={{
+        <div
+          className="relative w-full pb-16"
+          style={{
             backgroundImage: "url('/hero/background.svg')",
             backgroundRepeat: "repeat-y",
             backgroundSize: "100%",

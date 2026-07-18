@@ -1,11 +1,23 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Montserrat, Poppins, Anton } from "next/font/google";
 import "./globals.css";
-import { AnimatedBackground } from "./(utils)/components/layout/AnimatedBackground";
+import { GlobalBackground } from "./(utils)/components/layout/GlobalBackground";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
+});
+
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const anton = Anton({
+  variable: "--font-anton",
+  subsets: ["latin"],
+  weight: ["400"],
 });
 
 export const metadata: Metadata = {
@@ -20,10 +32,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${montserrat.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-white text-slate-900">
-        <AnimatedBackground />
-        {children}
+    <html lang="id" className={`${montserrat.variable} ${poppins.variable} ${anton.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col text-slate-900">
+        <GlobalBackground>
+          {children}
+        </GlobalBackground>
       </body>
     </html>
   );
