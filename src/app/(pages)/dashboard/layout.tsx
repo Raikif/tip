@@ -48,14 +48,15 @@ export default function DashboardLayout({
   const cat = timeline?.[category as keyof typeof timeline];
 
   const now = Date.now();
-  function hasTimePassed(time?: number, stageVal?: string): boolean {
+  function hasTimePassed(time?: number | string, stageVal?: string): boolean {
     if (bypass) {
       if (bypass === "2") return true;
       if (bypass === "1" && stageVal === "1") return true;
       return false;
     }
     if (!time) return false;
-    return now >= time;
+    const timeNum = typeof time === "string" ? new Date(time).getTime() : time;
+    return now >= timeNum;
   }
 
   const abstrakAnnounce = cat?.pengumuman_abstrak?.time;

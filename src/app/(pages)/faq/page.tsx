@@ -30,7 +30,7 @@ const questions = [
   "Bagaimana cara mengetahui update terbaru jika jadwal berubah mendadak?",
 ];
 
-function QuestionCard({ question }) {
+function QuestionCard({ question }: { question: string }) {
   return (
     <article className="faq-card">
       <div className="faq-card__dashed-border">

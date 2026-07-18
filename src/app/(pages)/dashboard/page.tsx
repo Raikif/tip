@@ -252,14 +252,15 @@ function GuestHome({
     window.location.reload();
   };
 
-  function hasTimePassed(time?: number, stageVal?: string): boolean {
+  function hasTimePassed(time?: number | string, stageVal?: string): boolean {
     if (bypass) {
       if (bypass === "2") return true;
       if (bypass === "1" && stageVal === "1") return true;
       return false;
     }
     if (!time) return false;
-    return now >= time;
+    const timeNum = typeof time === "string" ? new Date(time).getTime() : time;
+    return now >= timeNum;
   }
 
   const abstrakAnnounce = cat?.pengumuman_abstrak?.time;
@@ -474,11 +475,11 @@ function GuestHome({
                             {stage.label || key}
                           </p>
                           <p className={`text-sm ${c.text} font-bold mt-1`}>
-                            {stage.start || stage.end
-                              ? formatDateRange(stage.start, stage.end)
-                              : stage.time
-                                ? formatMs(stage.time)
-                                : ""}
+                             {stage.start || stage.end
+                               ? formatDateRange(stage.start, stage.end)
+                               : stage.time
+                                 ? formatMs(typeof stage.time === "string" ? new Date(stage.time).getTime() : stage.time)
+                                 : ""}
                           </p>
                         </div>
                       </div>

@@ -1,9 +1,12 @@
 export interface EventStage {
   start?: number;
   end?: number;
-  time?: number;
+  time?: number | string;
   label: string;
   order?: number;
+  startsAt?: string | number;
+  endsAt?: string | number;
+  countdownTitle?: string;
 }
 
 export interface EventCategory {

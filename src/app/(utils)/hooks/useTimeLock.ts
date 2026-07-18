@@ -37,7 +37,8 @@ export function useTimeLock(
     if (stage.start !== undefined && stage.end !== undefined) {
       setIsLocked(now < stage.start || now > stage.end);
     } else if (stage.time !== undefined) {
-      setIsLocked(now < stage.time);
+      const timeNum = typeof stage.time === "string" ? new Date(stage.time).getTime() : stage.time;
+      setIsLocked(now < timeNum);
     } else {
       setIsLocked(true);
     }

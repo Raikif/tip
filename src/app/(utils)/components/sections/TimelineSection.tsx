@@ -48,9 +48,10 @@ function formatDateRange(start?: number, end?: number): string {
   return `${sDay} ${sMonth} - ${eDay} ${eMonth}`;
 }
 
-function formatSingleTime(time?: number): string {
-  if (!time) return "";
-  const d = new Date(time);
+function formatSingleTime(time?: number | string): string {
+  if (!time && time !== 0) return "";
+  const timeNum = typeof time === "string" ? new Date(time).getTime() : time;
+  const d = new Date(timeNum);
   const day = d.getDate();
   const month = MONTHS_ID[String(d.getMonth() + 1).padStart(2, "0")];
   return `${day} ${month}`;
@@ -59,9 +60,12 @@ function formatSingleTime(time?: number): string {
 function stageToDisplayDate(stage: {
   start?: number;
   end?: number;
-  time?: number;
+  time?: number | string;
 }): string {
-  if (stage.time) return formatSingleTime(stage.time);
+  if (stage.time) {
+    const timeNum = typeof stage.time === "string" ? new Date(stage.time).getTime() : stage.time;
+    return formatSingleTime(timeNum);
+  }
   if (stage.start || stage.end) return formatDateRange(stage.start, stage.end);
   return "";
 }

@@ -61,14 +61,18 @@ export async function getCurrentStage(
       return now >= stage.start && now <= stage.end;
     }
     if (stage.time !== undefined) {
-      return now >= stage.time;
+      const timeNum = typeof stage.time === "string" ? new Date(stage.time).getTime() : stage.time;
+      return now >= timeNum;
     }
     return false;
   };
 
   const hasPassed = (stage: EventStage): boolean => {
     if (stage.end !== undefined) return now > stage.end;
-    if (stage.time !== undefined) return now > stage.time;
+    if (stage.time !== undefined) {
+      const timeNum = typeof stage.time === "string" ? new Date(stage.time).getTime() : stage.time;
+      return now > timeNum;
+    }
     return false;
   };
 
@@ -121,4 +125,27 @@ export async function getCurrentStage(
   }
 
   return "administrasi";
+}
+
+type Track = "lkti" | "essay" | "poster";
+
+export async function addStage(
+  track: Track,
+  key: string,
+  stage: EventStage,
+): Promise<void> {
+  const db = getFirebaseAdminDb();
+  await db.ref(`event/${track}/${key}`).set(stage);
+}
+
+export async function deleteStage(track: Track, key: string): Promise<void> {
+  const db = getFirebaseAdminDb();
+  await db.ref(`event/${track}/${key}`).remove();
+}
+
+export async function updateEventTimeline(
+  timeline: Record<Track, EventCategory>,
+): Promise<void> {
+  const db = getFirebaseAdminDb();
+  await db.ref("event").set(timeline);
 }

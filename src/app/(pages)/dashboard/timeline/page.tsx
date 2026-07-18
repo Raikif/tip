@@ -34,9 +34,9 @@ function toDateTimeLocal(iso?: string | number): string {
   return str.slice(0, 16);
 }
 
-function fromDateTimeLocal(value: string): string {
-  if (!value) return "";
-  return `${value}:00+07:00`;
+function fromDateTimeLocal(value: string | number | undefined): string {
+  if (!value && value !== 0) return "";
+  return `${String(value)}:00+07:00`;
 }
 
 function formatDateTime(iso?: string | number): string {
