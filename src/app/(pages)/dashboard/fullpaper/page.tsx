@@ -120,7 +120,14 @@ export default function FullpaperPage() {
           <div className="bg-white/5 border border-white/20 p-6 rounded-[1.2rem]">
             <h3 className="text-lg font-bold text-white mb-4">Informasi Pembayaran ({waveInfo.waveName})</h3>
             <p className="text-white/80 mb-2">Biaya Pendaftaran: <strong className="text-yellow-300 text-xl ml-2">{waveInfo.formattedPrice}</strong></p>
-            <p className="text-white/80 mb-4">Transfer ke Rekening: <strong className="text-white">{waveInfo.bankAccount}</strong></p>
+            <div className="text-white/80 mb-4">
+              <p>Transfer ke Rekening:</p>
+              <ul className="list-disc list-inside mt-2 ml-2 space-y-1">
+                <li>Bank BRI: <strong className="text-white">3539 0104 7607 530</strong></li>
+                <li>Bank Mandiri: <strong className="text-white">1370 0261 3874 9</strong></li>
+              </ul>
+              <p className="mt-2 ml-2">an. <strong className="text-white">Ristama Simangunsong</strong></p>
+            </div>
             <FileDropUpload label="Upload Bukti Pembayaran" accept="image/*,.pdf" maxSizeMB={2} teamName={user.user_name} stage="penyisihan" onUpload={setBuktiPembayaran} />
           </div>
 
