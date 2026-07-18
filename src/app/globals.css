@@ -1,26 +1,56 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-purple: #7c3aed;
+  --color-brand-orange: #f97316;
+  --color-brand-purple-dark: #5b21b6;
+  --color-brand-orange-dark: #c2410c;
+  --color-brand-pink: #d946ef;
+}
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --foreground: #0f172a;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Base styles for the full screen sections */
+.panel {
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Initially hide the panels below the first one using clip-path triangle pointing up from bottom */
+.panel-hidden {
+  clip-path: polygon(50% 100%, 50% 100%, 50% 100%);
+  z-index: 10;
+}
+
+/* Colors for specific panels */
+.bg-hero {
+  background: linear-gradient(135deg, #ede9fe, #f3e8ff);
+}
+
+/* Glassmorphism Utilities */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }

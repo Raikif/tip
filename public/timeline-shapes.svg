@@ -1,0 +1,38 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 1440 611"
+  preserveAspectRatio="none"
+  fill="none"
+  aria-hidden="true"
+>
+  <!-- Base background -->
+  <path
+    d="M0 0h1440v611H0z"
+    fill="#BD4DF9"
+  />
+
+  <!-- Solid section dividers -->
+  <path
+    d="
+      M0 0.75h1440
+      M0 94.699h1440
+      M0 515.801h1440
+      M0 609.75h1440
+    "
+    stroke="#000"
+    stroke-width="1.5"
+    vector-effect="non-scaling-stroke"
+  />
+
+  <!-- Decorative dashed lines -->
+  <path
+    d="
+      M0 69.5h1440
+      M0 585.25h1440
+    "
+    stroke="#000"
+    stroke-width="1.5"
+    stroke-dasharray="12 12"
+    vector-effect="non-scaling-stroke"
+  />
+</svg>

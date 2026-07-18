@@ -1,0 +1,118 @@
+{
+  "event": {
+    "lkti": {
+      "pendaftaran": {
+        "start": 1784611200000,
+        "end": 1788067199000,
+        "label": "Pendaftaran",
+        "order": 31536000001
+      },
+      "seleksi_abstrak": {
+        "start": 1786080000000,
+        "end": 1786425599000,
+        "label": "Penilaian Abstrak",
+        "order": 31536000002
+      },
+      "pengumuman_abstrak": {
+        "time": 1786512000000,
+        "label": "Abstrak Announce",
+        "order": 31536000003
+      },
+      "pengumpulan_fullpaper": {
+        "start": 1786512000000,
+        "end": 1788758399000,
+        "label": "Pengumpulan Fullpaper",
+        "order": 31536000004
+      },
+      "pengumuman_fullpaper": {
+        "time": 1789622400000,
+        "label": "Fullpaper Announce",
+        "order": 31536000005
+      },
+      "final": {
+        "time": 1790400000000,
+        "label": "Final & Awarding",
+        "order": 31536000006
+      }
+    },
+    "essay": {
+      "pendaftaran": {
+        "start": 1784611200000,
+        "end": 1788067199000,
+        "label": "Pendaftaran",
+        "order": 31536000001
+      },
+      "seleksi_abstrak": {
+        "start": 1786080000000,
+        "end": 1786425599000,
+        "label": "Penilaian Abstrak",
+        "order": 31536000002
+      },
+      "pengumuman_abstrak": {
+        "time": 1786512000000,
+        "label": "Abstrak Announce",
+        "order": 31536000003
+      },
+      "pengumpulan_fullpaper": {
+        "start": 1786512000000,
+        "end": 1788758399000,
+        "label": "Pengumpulan Fullpaper",
+        "order": 31536000004
+      },
+      "pengumuman_fullpaper": {
+        "time": 1789622400000,
+        "label": "Fullpaper Announce",
+        "order": 31536000005
+      },
+      "final": {
+        "time": 1790400000000,
+        "label": "Final & Awarding",
+        "order": 31536000006
+      }
+    },
+    "poster": {
+      "pendaftaran": {
+        "start": 1784611200000,
+        "end": 1788067199000,
+        "label": "Pendaftaran",
+        "order": 31536000001
+      },
+      "pengumpulan_poster": {
+        "start": 1788153600000,
+        "end": 1789363199000,
+        "label": "Pengumpulan Poster",
+        "order": 31536000002
+      },
+      "pengumuman_poster": {
+        "time": 1789449600000,
+        "label": "Pengumuman Poster",
+        "order": 31536000003
+      },
+      "pengumpulan_poster_final": {
+        "start": 1789536000000,
+        "end": 1789795199000,
+        "label": "Pengumpulan Poster Final",
+        "order": 31536000004
+      },
+      "pengumuman_poster_final": {
+        "time": 1789881600000,
+        "label": "Pengumuman Final Poster",
+        "order": 31536000005
+      },
+      "final": {
+        "time": 1790400000000,
+        "label": "Final & Awarding",
+        "order": 31536000006
+      }
+    }
+  },
+  "users": {
+    "admin1": {
+      "email": "email@gmail.com",
+      "password": "$2b$10$ouyFE/enotMHl.DygasX4.J.XxWAg00KsgnJYQdteE978CGXys8Dq",
+      "name": "Admin",
+      "role": "admin",
+      "createdAt": "2025-07-14T00:00:00.000Z"
+    }
+  }
+}
