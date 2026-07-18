@@ -24,7 +24,7 @@ const EMPTY_STAGE: EventStage = {
   order: undefined,
   startsAt: "",
   endsAt: "",
-  time: "",
+  time: undefined,
   countdownTitle: "",
 };
 
