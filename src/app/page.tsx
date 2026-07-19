@@ -8,10 +8,14 @@ import AboutUsSection from "@/app/(utils)/components/sections/AboutUsSection";
 import FaqSection from "@/components/sections/FaqSection";
 import SmoothScrollProvider from "@/app/(utils)/components/providers/SmoothScrollProvider";
 import AnimatedSection from "@/app/(utils)/components/providers/AnimatedSection";
+import { GlobalBackground } from "@/app/(utils)/components/layout/GlobalBackground";
+import { AnimatedBackground } from "@/app/(utils)/components/layout/AnimatedBackground";
 
 export default function LandingPage() {
   return (
-    <SmoothScrollProvider>
+    <GlobalBackground>
+      <AnimatedBackground />
+      <SmoothScrollProvider>
       <HeroSection />
       <AnimatedSection type="up" id="timeline-wrapper">
         <div
@@ -180,5 +184,6 @@ export default function LandingPage() {
         </div>
       </AnimatedSection>
     </SmoothScrollProvider>
+    </GlobalBackground>
   );
 }
