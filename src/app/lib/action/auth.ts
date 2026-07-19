@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { getFirebaseAdminDb } from "../server/firebase";
 import { createSession } from "../server/auth/sessions";
 import { loginFormSchema } from "@/app/(utils)/zod/auth";
+import { headers } from "next/headers";
 
 export async function loginUser(formData: FormData) {
   try {
@@ -107,6 +108,40 @@ export async function registerUser(data: {
   anggota2TwibbonFile?: any;
 }) {
   try {
+    const db = getFirebaseAdminDb();
+    const headersList = await headers();
+    const clientIp =
+      headersList.get("x-forwarded-for")?.split(",")[0].trim() ||
+      headersList.get("x-real-ip") ||
+      "unknown";
+
+    const pesertaSnapshot = await db.ref("peserta").once("value");
+    const peserta = pesertaSnapshot.val() as Record<string, any> | null;
+
+    if (peserta) {
+      const alreadyRegistered = Object.values(peserta).find(
+        (item: any) => item.ipAddress === clientIp,
+      );
+      if (alreadyRegistered) {
+        return {
+          ok: false,
+          error: "Pendaftaran gagal: Alamat IP ini sudah pernah melakukan pendaftaran. Setiap IP hanya dapat mendaftar satu kali.",
+        };
+      }
+
+      const duplicateTeam = Object.entries(peserta).find(
+        ([, value]) =>
+          (value?.teamName || "").trim().toLowerCase() ===
+          data.teamName.trim().toLowerCase(),
+      );
+      if (duplicateTeam) {
+        return {
+          ok: false,
+          error: `Nama tim "${data.teamName}" sudah terdaftar. Gunakan nama tim yang berbeda.`,
+        };
+      }
+    }
+
     const hash = bcrypt.hashSync(data.leaderPassword, 10);
 
     const payload = {
@@ -140,9 +175,9 @@ export async function registerUser(data: {
       anggota2TwibbonFile: data.anggota2TwibbonFile || null,
       registeredAt: new Date().toISOString(),
       status: "pending",
+      ipAddress: clientIp,
     };
 
-    const db = getFirebaseAdminDb();
     await db.ref(`peserta/${payload.teamName}`).set(payload);
 
     return { ok: true, teamName: payload.teamName };

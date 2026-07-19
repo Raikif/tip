@@ -10,6 +10,7 @@ import {
   CreditCard,
   Lock,
   Info,
+  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 import { useEventTimeline } from "@/app/(utils)/hooks/useEventTimeline";
@@ -417,6 +418,15 @@ export default function RegistrationPage() {
 
           {/* Form Body */}
           <form onSubmit={handleSubmit} className="p-8 md:p-10 relative">
+            {currentStep < 3 && (
+              <div className="bg-red-500/20 border border-red-400/60 text-red-100 p-5 rounded-2xl text-sm shadow-sm backdrop-blur-md font-semibold flex items-start gap-4 relative z-10 mb-8">
+                <AlertTriangle className="shrink-0 mt-0.5 text-red-300" size={22} />
+                <p>
+                  Setiap alamat IP hanya dapat melakukan pendaftaran <span className="font-bold text-red-200">satu kali</span>.
+                  Pastikan semua data yang dimasukkan sudah benar sebelum melanjutkan.
+                </p>
+              </div>
+            )}
             {currentStep === 1 && (
               <div className="space-y-6 animate-entrance relative z-10">
                 <div className="bg-orange-500/20 border-l-4 border-orange-400 p-4 rounded-r-xl mb-8 text-sm text-orange-100 shadow-sm flex items-start gap-3 backdrop-blur-md">
