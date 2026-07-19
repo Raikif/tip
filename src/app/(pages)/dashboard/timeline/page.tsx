@@ -54,6 +54,12 @@ function formatDateTime(iso?: string | number): string {
   }).format(date);
 }
 
+type DragItem = {
+  track: Track;
+  key: string;
+  index: number;
+};
+
 export default function AdminTimelinePage() {
   const [timeline, setTimeline] = useState<Record<Track, EventCategory>>({
     lkti: {},
@@ -69,6 +75,9 @@ export default function AdminTimelinePage() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
+
+  const [dragItem, setDragItem] = useState<DragItem | null>(null);
+  const [dragOverItem, setDragOverItem] = useState<string | null>(null);
 
   useEffect(() => {
     loadTimeline();
@@ -132,6 +141,24 @@ export default function AdminTimelinePage() {
       setTimeout(() => setMsg(""), 3000);
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : "Gagal menyimpan timeline.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleReorder() {
+    setSaving(true);
+    setErr("");
+    setMsg("");
+    try {
+      const { reorderEventTimeline } = await import("@/app/lib/action/events");
+      await reorderEventTimeline(timeline as EventCategory extends infer C
+        ? Record<Track, C>
+        : never);
+      setMsg("Urutan timeline berhasil disimpan.");
+      setTimeout(() => setMsg(""), 3000);
+    } catch (e: unknown) {
+      setErr(e instanceof Error ? e.message : "Gagal menyimpan urutan.");
     } finally {
       setSaving(false);
     }
@@ -202,6 +229,41 @@ export default function AdminTimelinePage() {
     } catch {
       setErr("Gagal menghapus stage.");
     }
+  }
+
+  function handleDragStart(key: string, index: number) {
+    setDragItem({ track: activeTrack, key, index });
+  }
+
+  function handleDragOver(e: React.DragEvent, key: string) {
+    e.preventDefault();
+    setDragOverItem(key);
+  }
+
+  function handleDrop(targetKey: string) {
+    if (!dragItem || dragItem.key === targetKey) return;
+
+    setTimeline((prev) => {
+      const track = prev[activeTrack];
+      const entries = Object.entries(track);
+      const fromIndex = entries.findIndex(([k]) => k === dragItem.key);
+      const toIndex = entries.findIndex(([k]) => k === targetKey);
+      if (fromIndex < 0 || toIndex < 0) return prev;
+
+      const nextEntries = [...entries];
+      const [moved] = nextEntries.splice(fromIndex, 1);
+      nextEntries.splice(toIndex, 0, moved);
+
+      const reordered: EventCategory = {};
+      nextEntries.forEach(([k, v], idx) => {
+        reordered[k] = { ...v, order: (idx + 1) * 1000 };
+      });
+
+      return { ...prev, [activeTrack]: reordered };
+    });
+
+    setDragItem(null);
+    setDragOverItem(null);
   }
 
   const currentCategory = timeline[activeTrack];
@@ -404,70 +466,100 @@ export default function AdminTimelinePage() {
             <p className="text-lg font-medium">Belum ada stage untuk kategori ini.</p>
           </div>
         ) : (
-          <table className="w-full text-white">
-            <thead>
-              <tr className="border-b border-white/20 bg-white/5">
-                <th className="text-left p-4 font-bold text-sm text-white/70 w-12">
-                  #
-                </th>
-                <th className="text-left p-4 font-bold text-sm text-white/70">
-                  Key
-                </th>
-                <th className="text-left p-4 font-bold text-sm text-white/70">
-                  Label
-                </th>
-                <th className="text-left p-4 font-bold text-sm text-white/70">
-                  Order
-                </th>
-                <th className="text-left p-4 font-bold text-sm text-white/70">
-                  Waktu
-                </th>
-                <th className="text-right p-4 font-bold text-sm text-white/70">
-                  Aksi
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedStages.map(([key, stage], idx) => (
-                <tr
-                  key={key}
-                  className="border-b border-white/10 hover:bg-white/5 transition-colors"
-                >
-                  <td className="p-4 font-bold text-white/50">{idx + 1}</td>
-                  <td className="p-4 font-mono text-sm text-white/70">{key}</td>
-                  <td className="p-4 font-bold">{stage.label ?? key}</td>
-                  <td className="p-4 text-white/70">{stage.order ?? "-"}</td>
-                  <td className="p-4 text-white/70 text-xs">
-                    {stage.startsAt || stage.endsAt ? (
-                      <span>
-                        {formatDateTime(stage.startsAt)} &rarr; {formatDateTime(stage.endsAt)}
-                      </span>
-                    ) : stage.time ? (
-                      <span>{formatDateTime(stage.time)}</span>
-                    ) : (
-                      <span className="text-white/40">-</span>
-                    )}
-                  </td>
-                  <td className="p-4 text-right flex gap-2 justify-end">
-                    <button
-                      onClick={() => startEdit(key, stage)}
-                      className="p-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 transition-all"
-                      title="Edit"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(key, stage.label ?? key)}
-                      className="p-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 transition-all"
-                      title="Hapus"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
+          <>
+            <div className="flex justify-end px-4 py-3 border-b border-white/10">
+              <button
+                onClick={handleReorder}
+                disabled={saving}
+                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white/80 text-sm font-bold rounded-[1rem] transition-all disabled:opacity-50"
+              >
+                {saving && <Loader2 size={14} className="animate-spin" />}
+                Simpan Urutan
+              </button>
+            </div>
+            <table className="w-full text-white">
+              <thead>
+                <tr className="border-b border-white/20 bg-white/5">
+                  <th className="text-left p-4 font-bold text-sm text-white/70 w-12">
+                    #
+                  </th>
+                  <th className="text-left p-4 font-bold text-sm text-white/70 w-12">
+                    &nbsp;
+                  </th>
+                  <th className="text-left p-4 font-bold text-sm text-white/70">
+                    Key
+                  </th>
+                  <th className="text-left p-4 font-bold text-sm text-white/70">
+                    Label
+                  </th>
+                  <th className="text-left p-4 font-bold text-sm text-white/70">
+                    Order
+                  </th>
+                  <th className="text-left p-4 font-bold text-sm text-white/70">
+                    Waktu
+                  </th>
+                  <th className="text-right p-4 font-bold text-sm text-white/70">
+                    Aksi
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {sortedStages.map(([key, stage], idx) => (
+                  <tr
+                    key={key}
+                    draggable
+                    onDragStart={() => handleDragStart(key, idx)}
+                    onDragOver={(e) => handleDragOver(e, key)}
+                    onDrop={() => handleDrop(key)}
+                    onDragEnd={() => {
+                      setDragItem(null);
+                      setDragOverItem(null);
+                    }}
+                    className={`border-b border-white/10 transition-colors cursor-grab active:cursor-grabbing ${
+                      dragOverItem === key ? "bg-white/20" : "hover:bg-white/5"
+                    }`}
+                  >
+                    <td className="p-4 font-bold text-white/50">{idx + 1}</td>
+                    <td className="p-4">
+                      <div className="text-white/40 hover:text-white/80 transition-colors">
+                        <GripVertical size={18} />
+                      </div>
+                    </td>
+                    <td className="p-4 font-mono text-sm text-white/70">{key}</td>
+                    <td className="p-4 font-bold">{stage.label ?? key}</td>
+                    <td className="p-4 text-white/70">{stage.order ?? "-"}</td>
+                    <td className="p-4 text-white/70 text-xs">
+                      {(stage.start || stage.end) ? (
+                        <span>
+                          {formatDateTime(stage.start)} &rarr; {formatDateTime(stage.end)}
+                        </span>
+                      ) : stage.time ? (
+                        <span>{formatDateTime(stage.time)}</span>
+                      ) : (
+                        <span className="text-white/40">-</span>
+                      )}
+                    </td>
+                    <td className="p-4 text-right flex gap-2 justify-end">
+                      <button
+                        onClick={() => startEdit(key, stage)}
+                        className="p-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 transition-all"
+                        title="Edit"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(key, stage.label ?? key)}
+                        className="p-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 transition-all"
+                        title="Hapus"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         )}
       </div>
     </div>

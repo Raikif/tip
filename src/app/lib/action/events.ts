@@ -3,6 +3,32 @@
 import { getFirebaseAdminDb } from "../server/firebase";
 import type { EventTimeline, EventCategory, EventStage } from "@/app/(utils)/types/event";
 
+function getTimestamp(value: unknown): number | undefined {
+  if (typeof value === "number") return value;
+  if (typeof value === "string" && value) {
+    const time = new Date(value).getTime();
+    return Number.isNaN(time) ? undefined : time;
+  }
+  return undefined;
+}
+
+function normalizeStage(stage: EventStage): Record<string, unknown> {
+  const data: Record<string, unknown> = {
+    label: stage.label,
+    order: stage.order,
+    time: stage.time,
+  };
+
+  const start = getTimestamp(stage.startsAt ?? stage.start);
+  const end = getTimestamp(stage.endsAt ?? stage.end);
+
+  if (start !== undefined) data.start = start;
+  if (end !== undefined) data.end = end;
+  if (stage.countdownTitle) data.countdownTitle = stage.countdownTitle;
+
+  return data;
+}
+
 export async function getEventTimeline(): Promise<EventTimeline> {
   const db = getFirebaseAdminDb();
   const snapshot = await db.ref("event").once("value");
@@ -33,11 +59,12 @@ export async function getEventTimeline(): Promise<EventTimeline> {
     for (const [stageKey, stageData] of Object.entries(stages)) {
       if (typeof stageData === "object" && stageData !== null) {
         cat[stageKey] = {
-          start: stageData.start ?? undefined,
-          end: stageData.end ?? undefined,
+          start: getTimestamp(stageData.start ?? stageData.startsAt),
+          end: getTimestamp(stageData.end ?? stageData.endsAt),
           time: stageData.time ?? undefined,
           label: stageData.label ?? stageKey,
           order: stageData.order ?? undefined,
+          countdownTitle: stageData.countdownTitle ?? undefined,
         };
       }
     }
@@ -135,7 +162,7 @@ export async function addStage(
   stage: EventStage,
 ): Promise<void> {
   const db = getFirebaseAdminDb();
-  await db.ref(`event/${track}/${key}`).set(stage);
+  await db.ref(`event/${track}/${key}`).set(normalizeStage(stage));
 }
 
 export async function deleteStage(track: Track, key: string): Promise<void> {
@@ -143,9 +170,30 @@ export async function deleteStage(track: Track, key: string): Promise<void> {
   await db.ref(`event/${track}/${key}`).remove();
 }
 
+export async function reorderEventTimeline(
+  timeline: Record<Track, EventCategory>,
+): Promise<void> {
+  const db = getFirebaseAdminDb();
+  const normalized: Record<string, Record<string, unknown>> = {};
+  for (const [track, categories] of Object.entries(timeline)) {
+    normalized[track] = {};
+    for (const [key, stage] of Object.entries(categories)) {
+      normalized[track][key] = normalizeStage(stage);
+    }
+  }
+  await db.ref("event").set(normalized);
+}
+
 export async function updateEventTimeline(
   timeline: Record<Track, EventCategory>,
 ): Promise<void> {
   const db = getFirebaseAdminDb();
-  await db.ref("event").set(timeline);
+  const normalized: Record<string, Record<string, unknown>> = {};
+  for (const [track, categories] of Object.entries(timeline)) {
+    normalized[track] = {};
+    for (const [key, stage] of Object.entries(categories)) {
+      normalized[track][key] = normalizeStage(stage);
+    }
+  }
+  await db.ref("event").set(normalized);
 }

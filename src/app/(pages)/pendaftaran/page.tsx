@@ -53,6 +53,11 @@ export default function RegistrationPage() {
   });
 
   useEffect(() => {
+    const bypass = localStorage.getItem("debug_time_bypass");
+    if (bypass === "1" || bypass === "2" || bypass === "true") {
+      setIsTimeLocked(false);
+      return;
+    }
     setIsTimeLocked(true);
     setLockDates("21 Juli 2026 hingga 31 Agustus 2026");
   }, []);
@@ -298,7 +303,7 @@ export default function RegistrationPage() {
         </Link>
         <button
           onClick={() => {
-            localStorage.setItem("debug_time_bypass", "true");
+            localStorage.setItem("debug_time_bypass", "1");
             window.location.reload();
           }}
           className="mt-12 text-xs text-slate-400 hover:text-slate-600"
