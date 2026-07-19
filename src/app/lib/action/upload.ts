@@ -39,6 +39,29 @@ function sanitizeName(name: string): string {
   return name.replace(/[^a-zA-Z0-9_-]/g, "_");
 }
 
+function getFileExtension(name: string): string {
+  const match = name.match(/\.[a-zA-Z0-9]+$/);
+  return match ? match[0] : "";
+}
+
+function getFieldLabel(field: string): string {
+  const map: Record<string, string> = {
+    ketua_ktm: "KTM",
+    anggota1_ktm: "KTM",
+    anggota2_ktm: "KTM",
+    ketua_follow_ig: "FollowIG",
+    ketua_story_ig: "StoryIG",
+    ketua_twibbon: "Twibbon",
+    anggota1_follow_ig: "FollowIG",
+    anggota1_story_ig: "StoryIG",
+    anggota1_twibbon: "Twibbon",
+    anggota2_follow_ig: "FollowIG",
+    anggota2_story_ig: "StoryIG",
+    anggota2_twibbon: "Twibbon",
+  };
+  return map[field] || field;
+}
+
 async function getOrCreateFolder(
   drive: drive_v3.Drive,
   parentId: string,
@@ -74,6 +97,7 @@ async function getOrCreateFolder(
 export async function uploadFile(formData: FormData): Promise<UploadResult> {
   try {
     const file = formData.get("file");
+    const field = (formData.get("field") as string | null)?.trim() || "";
     const teamName =
       (formData.get("teamName") as string | null)?.trim() || "unknown";
     const stage =
@@ -82,6 +106,13 @@ export async function uploadFile(formData: FormData): Promise<UploadResult> {
     if (!file || !(file instanceof File)) {
       return { ok: false, error: "File tidak ditemukan." };
     }
+
+    const ext = getFileExtension(file.name);
+    const label = getFieldLabel(field);
+    const customName = field
+      ? `${label}_${sanitizeName(teamName)}${ext}`
+      : `${Date.now()}_${file.name}`;
+    const fileName = customName;
 
     const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL;
     const privateKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY;
@@ -93,7 +124,7 @@ export async function uploadFile(formData: FormData): Promise<UploadResult> {
         ok: true,
         fileId: `mock-file-${Date.now()}`,
         url: `https://mock-url.com/${Date.now()}_${sanitizeName(file.name)}`,
-        fileName: file.name,
+        fileName: customName,
         fileSize: file.size,
         fileType: file.type || "application/octet-stream",
       };
@@ -101,8 +132,6 @@ export async function uploadFile(formData: FormData): Promise<UploadResult> {
 
     const auth = getAuth();
     const drive = google.drive({ version: "v3", auth });
-
-    const fileName = `${Date.now()}_${file.name}`;
 
     // Build nested folder path: Peserta -> {teamName} -> {stage}
     let folderId = SHARED_DRIVE_ID;

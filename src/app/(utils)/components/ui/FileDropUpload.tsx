@@ -10,6 +10,7 @@ export function FileDropUpload({
   onUpload,
   teamName,
   stage = "penyisihan",
+  field,
 }: {
   label: string;
   accept: string;
@@ -23,6 +24,7 @@ export function FileDropUpload({
   }) => void;
   teamName: string;
   stage?: string;
+  field?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
@@ -39,6 +41,9 @@ export function FileDropUpload({
     try {
       const fd = new FormData();
       fd.set("file", file);
+      if (field) {
+        fd.set("field", field);
+      }
       fd.set("teamName", teamName);
       fd.set("stage", stage);
 

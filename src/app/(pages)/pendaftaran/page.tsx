@@ -155,6 +155,7 @@ export default function RegistrationPage() {
   }> => {
     const payload = new FormData();
     payload.append("file", file);
+    payload.append("field", field);
     payload.append("teamName", formData.teamName || "unknown");
     payload.append("stage", "administrasi");
 
