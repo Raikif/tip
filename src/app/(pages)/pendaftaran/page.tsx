@@ -53,37 +53,9 @@ export default function RegistrationPage() {
   });
 
   useEffect(() => {
-    if (!timeline) return;
-    const bypass = localStorage.getItem("debug_time_bypass");
-    if (bypass === "true") {
-      setIsTimeLocked(false);
-      return;
-    }
-
-    const allCats = ["lkti", "essay", "poster"] as const;
-    let locked = false;
-    let dateStr = "";
-
-    for (const cat of allCats) {
-      const pendaftaran = timeline[cat]?.pendaftaran;
-      if (!pendaftaran) {
-        locked = true;
-        continue;
-      }
-      const now = Date.now();
-      if (pendaftaran.start && pendaftaran.end) {
-        if (now < pendaftaran.start || now > pendaftaran.end) {
-          locked = true;
-          if (!dateStr && pendaftaran.start && pendaftaran.end) {
-            dateStr = `${formatMs(pendaftaran.start)} hingga ${formatMs(pendaftaran.end)}`;
-          }
-        }
-      }
-    }
-
-    setIsTimeLocked(locked);
-    if (dateStr) setLockDates(dateStr);
-  }, [timeline]);
+    setIsTimeLocked(true);
+    setLockDates("21 Juli 2026 hingga 31 Agustus 2026");
+  }, []);
 
   const [files, setFiles] = useState<{
     ketuaKtm: File | null;

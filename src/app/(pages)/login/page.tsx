@@ -120,13 +120,16 @@ export default function LoginPage() {
 
             <div className="text-center mt-6">
               <p className="text-sm text-white/70 font-medium">
-                Belum punya akun?{" "}
                 <Link
-                  href="/pendaftaran"
-                  className="text-white font-bold hover:underline transition-colors drop-shadow-sm"
-                >
-                  Daftar sekarang
-                </Link>
+                href="/pendaftaran"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                className="text-white font-bold hover:underline transition-colors drop-shadow-sm"
+              >
+                Daftar sekarang
+              </Link>
               </p>
             </div>
 
