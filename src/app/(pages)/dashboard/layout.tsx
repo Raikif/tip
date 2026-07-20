@@ -89,9 +89,6 @@ export default function DashboardLayout({
           return;
         }
         setUser(session);
-        if (session.user_role === "admin") {
-          localStorage.setItem("debug_time_bypass", "1");
-        }
       } catch {
         router.push("/login");
       } finally {
@@ -268,12 +265,6 @@ export default function DashboardLayout({
                 pathname={pathname}
                 icon={<Calendar size={22} />}
                 label="Timeline"
-              />
-              <NavLink
-                href="/pendaftaran"
-                pathname={pathname}
-                icon={<FilePlus size={22} />}
-                label="Pendaftaran"
               />
             </>
           )}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { Input } from "@/app/(utils)/components/ui/Input";
 import { Button } from "@/app/(utils)/components/ui/Button";
@@ -26,12 +27,24 @@ function formatMs(ms: number): string {
 }
 
 export default function RegistrationPage() {
+  const searchParams = useSearchParams();
+  const passParam = searchParams.get("pass");
   const [currentStep, setCurrentStep] = useState(1);
   const [isTimeLocked, setIsTimeLocked] = useState(false);
   const [lockDates, setLockDates] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const { timeline } = useEventTimeline();
+
+  useEffect(() => {
+    const expectedPass = process.env.NEXT_PUBLIC_ADMIN_BYPASS_PASS;
+    if (expectedPass && passParam === expectedPass) {
+      setIsTimeLocked(false);
+      return;
+    }
+    setIsTimeLocked(true);
+    setLockDates("21 Juli 2026 hingga 31 Agustus 2026");
+  }, [passParam]);
 
   const [formData, setFormData] = useState({
     category: "",
@@ -51,16 +64,6 @@ export default function RegistrationPage() {
     member2Wa: "",
     member2Email: "",
   });
-
-  useEffect(() => {
-    const bypass = localStorage.getItem("debug_time_bypass");
-    if (bypass === "1" || bypass === "2" || bypass === "true") {
-      setIsTimeLocked(false);
-      return;
-    }
-    setIsTimeLocked(true);
-    setLockDates("21 Juli 2026 hingga 31 Agustus 2026");
-  }, []);
 
   const [files, setFiles] = useState<{
     ketuaKtm: File | null;
