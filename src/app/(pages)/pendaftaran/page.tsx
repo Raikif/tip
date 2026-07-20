@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Input } from "@/app/(utils)/components/ui/Input";
 import { Button } from "@/app/(utils)/components/ui/Button";
 import {
@@ -26,9 +26,7 @@ function formatMs(ms: number): string {
   return `${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-export default function RegistrationPage() {
-  const searchParams = useSearchParams();
-  const passParam = searchParams.get("pass");
+function RegistrationPageInner({ passParam }: { passParam: string | null }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isTimeLocked, setIsTimeLocked] = useState(false);
   const [lockDates, setLockDates] = useState("");
@@ -723,5 +721,41 @@ export default function RegistrationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function RegistrationSkeleton() {
+  return (
+    <div className="min-h-screen pt-28 pb-12 px-4 md:px-8 relative">
+      <div className="max-w-4xl mx-auto relative z-10">
+        <div className="max-w-3xl mx-auto bg-white/10 backdrop-blur-3xl rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-white/20 overflow-hidden relative z-10">
+          <div className="bg-white/5 px-8 py-10 text-white relative border-b border-white/10">
+            <div className="h-4 bg-white/10 rounded w-32 mb-4 animate-pulse" />
+            <div className="h-10 bg-white/10 rounded w-64 animate-pulse" />
+          </div>
+          <div className="p-8 md:p-10 space-y-6">
+            <div className="h-32 bg-white/5 rounded-2xl animate-pulse" />
+            <div className="h-32 bg-white/5 rounded-2xl animate-pulse" />
+            <div className="h-32 bg-white/5 rounded-2xl animate-pulse" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RegistrationSearchParams({ children }: { children: (passParam: string | null) => React.ReactNode }) {
+  const searchParams = useSearchParams();
+  const passParam = searchParams.get("pass");
+  return <>{children(passParam)}</>;
+}
+
+export default function RegistrationPage() {
+  return (
+    <Suspense fallback={<RegistrationSkeleton />}>
+      <RegistrationSearchParams>
+        {(passParam) => <RegistrationPageInner passParam={passParam} />}
+      </RegistrationSearchParams>
+    </Suspense>
   );
 }
