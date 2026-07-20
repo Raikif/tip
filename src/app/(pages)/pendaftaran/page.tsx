@@ -304,15 +304,6 @@ export default function RegistrationPage() {
         <Link href="/">
           <Button className="mt-8">Kembali ke Beranda</Button>
         </Link>
-        <button
-          onClick={() => {
-            localStorage.setItem("debug_time_bypass", "1");
-            window.location.reload();
-          }}
-          className="mt-12 text-xs text-slate-400 hover:text-slate-600"
-        >
-          [Bypass Waktu (Mode Admin)]
-        </button>
       </div>
     );
   }

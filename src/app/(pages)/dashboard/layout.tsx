@@ -100,6 +100,7 @@ export default function DashboardLayout({
 
   const handleLogout = async () => {
     await logoutUser();
+    localStorage.removeItem("debug_time_bypass");
     router.push("/login");
   };
 
