@@ -86,9 +86,14 @@ export default function CompetitionSection() {
               </li>
               <li className="flex items-center gap-2">✓ Presentasi finalis</li>
             </ul>
-            <button className="w-full py-3 rounded-xl bg-slate-900 text-white font-medium hover:bg-[var(--color-brand-purple)] transition-colors mt-auto">
+            <a
+              href="https://bit.ly/Guidebook-TICXCT2026"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3 rounded-xl bg-slate-900 text-white font-medium hover:bg-[var(--color-brand-purple)] transition-colors mt-auto text-center"
+            >
               Baca Panduan Mahasiswa
-            </button>
+            </a>
           </div>
 
           <div
@@ -118,9 +123,14 @@ export default function CompetitionSection() {
                 ✓ Penilaian publik (likes)
               </li>
             </ul>
-            <button className="w-full py-3 rounded-xl bg-slate-900 text-white font-medium hover:bg-[var(--color-brand-pink)] transition-colors mt-auto">
+            <a
+              href="https://bit.ly/Guidebook-TICXCT2026"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3 rounded-xl bg-slate-900 text-white font-medium hover:bg-[var(--color-brand-pink)] transition-colors mt-auto text-center"
+            >
               Baca Panduan SMA
-            </button>
+            </a>
           </div>
         </div>
       </div>
