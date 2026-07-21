@@ -118,8 +118,8 @@ export default function AdminTimelinePage() {
     setForm({
       label: stage.label ?? "",
       order: stage.order,
-      startsAt: toDateTimeLocal(stage.startsAt),
-      endsAt: toDateTimeLocal(stage.endsAt),
+      startsAt: toDateTimeLocal(stage.start),
+      endsAt: toDateTimeLocal(stage.end),
       time: toDateTimeLocal(stage.time),
       countdownTitle: stage.countdownTitle ?? "",
     });
@@ -181,30 +181,17 @@ export default function AdminTimelinePage() {
         countdownTitle: form.countdownTitle || undefined,
       };
 
-      if (editingKey) {
-        setTimeline((prev) => ({
-          ...prev,
-          [activeTrack]: {
-            ...prev[activeTrack],
-            [editingKey]: stagePayload,
-          },
-        }));
-      } else {
-        setTimeline((prev) => ({
-          ...prev,
-          [activeTrack]: {
-            ...prev[activeTrack],
-            [key]: stagePayload,
-          },
-        }));
-      }
-
       const { addStage } = await import("@/app/lib/action/events");
       await addStage(activeTrack, key, stagePayload);
 
+      setTimeline((prev) => {
+        const track = prev[activeTrack];
+        const next = { ...track, [key]: stagePayload };
+        return { ...prev, [activeTrack]: next };
+      });
+
       setMsg(editingKey ? "Stage berhasil diupdate." : "Stage berhasil ditambahkan.");
       resetForm();
-      loadTimeline();
       setTimeout(() => setMsg(""), 3000);
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : "Terjadi kesalahan.");
@@ -224,7 +211,6 @@ export default function AdminTimelinePage() {
         return { ...prev, [activeTrack]: next };
       });
       setMsg(`Stage "${label}" dihapus.`);
-      loadTimeline();
       setTimeout(() => setMsg(""), 3000);
     } catch {
       setErr("Gagal menghapus stage.");
