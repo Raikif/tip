@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FileText } from "lucide-react";
 import { Input } from "@/app/(utils)/components/ui/Input";
 import { Button } from "@/app/(utils)/components/ui/Button";
@@ -35,6 +35,17 @@ export default function AbstrakPage() {
   const [biodata, setBiodata] = useState<any>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    async function loadTeam() {
+      const { getMyTeam } = await import("@/app/lib/action/auth");
+      const team = await getMyTeam();
+      if (team && team.abstrak) {
+        setSubmitted(true);
+      }
+    }
+    loadTeam();
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

@@ -120,10 +120,7 @@ export default function HeroSection() {
             >
               <Link
                 href="/pendaftaran"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
+
                 className="inline-flex w-full items-center justify-center rounded-[1.1rem] bg-[#B44DFF] px-6 py-4 text-base font-semibold text-white shadow-[0_18px_40px_rgba(116,43,171,0.38)] transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[#A343F2] sm:min-w-[15rem] sm:w-auto sm:text-lg"
               >
                 Daftar Sekarang

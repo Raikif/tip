@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FilePlus } from "lucide-react";
 import { useSessionUser } from "@/app/(utils)/hooks/useSessionUser";
 import { useTimeLock } from "@/app/(utils)/hooks/useTimeLock";
@@ -43,6 +43,17 @@ export default function FullpaperPage() {
   const [orisinalitas, setOrisinalitas] = useState<any>(null);
   const [buktiPembayaran, setBuktiPembayaran] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function loadTeam() {
+      const { getMyTeam } = await import("@/app/lib/action/auth");
+      const team = await getMyTeam();
+      if (team && team.fullpaper) {
+        setSubmitted(true);
+      }
+    }
+    loadTeam();
+  }, []);
 
   const waveInfo = getCurrentWaveInfo(user?.category || "lkti");
 
@@ -114,7 +125,7 @@ export default function FullpaperPage() {
 
           <div className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
             <FileDropUpload label="Upload Lembar Orisinalitas" accept=".pdf" maxSizeMB={2} teamName={user.user_name} stage="penyisihan" onUpload={setOrisinalitas} />
-            <FileDropUpload label="Upload Fullpaper" accept=".pdf" maxSizeMB={10} teamName={user.user_name} stage="penyisihan" onUpload={setFile} />
+            <FileDropUpload label="Upload Fullpaper" accept=".pdf" maxSizeMB={4} teamName={user.user_name} stage="penyisihan" onUpload={setFile} />
           </div>
 
           <div className="bg-white/5 border border-white/20 p-6 rounded-[1.2rem]">

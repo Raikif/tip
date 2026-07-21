@@ -7,12 +7,14 @@ import Link from "next/link";
 
 export default function AdminTeamDetailPage() {
   const params = useParams();
-  const teamName = params.teamName as string;
+  const rawTeamName = params.teamName as string;
+  const teamName = rawTeamName ? decodeURIComponent(rawTeamName) : "";
   const [team, setTeam] = useState<any>(null);
   const [actionMsg, setActionMsg] = useState("");
 
   useEffect(() => {
     async function load() {
+      if (!teamName) return;
       const { getAllTeams } = await import("@/app/lib/action/users");
       const all = await getAllTeams();
       const found = all.find((t: any) => t.teamName === teamName);
@@ -129,6 +131,68 @@ export default function AdminTeamDetailPage() {
           <InfoRow label="Tgl Submit" value={team.abstrak.submittedAt ? new Date(team.abstrak.submittedAt).toLocaleString("id") : "-"} />
           {team.abstrak.file?.webViewLink && (
             <FileLink label="File Abstrak" url={team.abstrak.file.webViewLink} fileName={team.abstrak.file.fileName} />
+          )}
+        </div>
+      )}
+
+      {team.poster && (
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[1.5rem] p-6 space-y-4">
+          <h2 className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400 drop-shadow-sm pb-1">
+            Poster
+          </h2>
+          <InfoRow label="Judul" value={team.poster.title} />
+          <InfoRow label="Subtema" value={team.poster.subtema} />
+          <InfoRow label="Status" value={team.poster.status} />
+          <InfoRow label="Tgl Submit" value={team.poster.submittedAt ? new Date(team.poster.submittedAt).toLocaleString("id") : "-"} />
+          {team.poster.file?.webViewLink && (
+            <FileLink label="File Desain" url={team.poster.file.webViewLink} fileName={team.poster.file.fileName} />
+          )}
+          {team.poster.deskripsi?.webViewLink && (
+            <FileLink label="File Deskripsi" url={team.poster.deskripsi.webViewLink} fileName={team.poster.deskripsi.fileName} />
+          )}
+          {team.poster.biodata?.webViewLink && (
+            <FileLink label="File Biodata" url={team.poster.biodata.webViewLink} fileName={team.poster.biodata.fileName} />
+          )}
+          {team.poster.orisinalitas?.webViewLink && (
+            <FileLink label="Lembar Orisinalitas" url={team.poster.orisinalitas.webViewLink} fileName={team.poster.orisinalitas.fileName} />
+          )}
+          {team.poster.buktiPembayaran?.webViewLink && (
+            <FileLink label="Bukti Pembayaran Poster" url={team.poster.buktiPembayaran.webViewLink} fileName={team.poster.buktiPembayaran.fileName} />
+          )}
+        </div>
+      )}
+
+      {team.fullpaper && (
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[1.5rem] p-6 space-y-4">
+          <h2 className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-rose-400 drop-shadow-sm pb-1">
+            Fullpaper
+          </h2>
+          <InfoRow label="Judul" value={team.fullpaper.title} />
+          <InfoRow label="Subtema" value={team.fullpaper.subtema} />
+          <InfoRow label="Status" value={team.fullpaper.status} />
+          <InfoRow label="Tgl Submit" value={team.fullpaper.submittedAt ? new Date(team.fullpaper.submittedAt).toLocaleString("id") : "-"} />
+          {team.fullpaper.file?.webViewLink && (
+            <FileLink label="File Fullpaper" url={team.fullpaper.file.webViewLink} fileName={team.fullpaper.file.fileName} />
+          )}
+          {team.fullpaper.orisinalitas?.webViewLink && (
+            <FileLink label="Lembar Orisinalitas" url={team.fullpaper.orisinalitas.webViewLink} fileName={team.fullpaper.orisinalitas.fileName} />
+          )}
+          {team.fullpaper.buktiPembayaran?.webViewLink && (
+            <FileLink label="Bukti Pembayaran" url={team.fullpaper.buktiPembayaran.webViewLink} fileName={team.fullpaper.buktiPembayaran.fileName} />
+          )}
+        </div>
+      )}
+
+      {team.ppt && (
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[1.5rem] p-6 space-y-4">
+          <h2 className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 drop-shadow-sm pb-1">
+            PPT Final
+          </h2>
+          <InfoRow label="Link" value={team.ppt.link} />
+          <InfoRow label="Status" value={team.ppt.status} />
+          <InfoRow label="Tgl Submit" value={team.ppt.submittedAt ? new Date(team.ppt.submittedAt).toLocaleString("id") : "-"} />
+          {team.ppt.file?.webViewLink && (
+            <FileLink label="File PPT" url={team.ppt.file.webViewLink} fileName={team.ppt.file.fileName} />
           )}
         </div>
       )}

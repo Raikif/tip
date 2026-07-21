@@ -45,6 +45,7 @@ export async function submitPoster(data: {
   biodata?: { fileName: string; fileSize: number; fileId: string; webViewLink: string; fileType: string };
   orisinalitas?: { fileName: string; fileSize: number; fileId: string; webViewLink: string; fileType: string };
   buktiPembayaran?: { fileName: string; fileSize: number; fileId: string; webViewLink: string; fileType: string };
+  deskripsi?: { fileName: string; fileSize: number; fileId: string; webViewLink: string; fileType: string };
 }) {
   const sessionCookie = await getSession();
   if (!sessionCookie) return { ok: false, error: "Unauthorized" };
@@ -67,6 +68,7 @@ export async function submitPoster(data: {
     biodata: data.biodata || null,
     orisinalitas: data.orisinalitas || null,
     buktiPembayaran: data.buktiPembayaran || null,
+    deskripsi: data.deskripsi || null,
     submittedAt: new Date().toISOString(),
     status: "submitted",
   });

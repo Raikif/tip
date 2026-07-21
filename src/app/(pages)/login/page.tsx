@@ -121,36 +121,12 @@ export default function LoginPage() {
             <div className="text-center mt-6">
               <p className="text-sm text-white/70 font-medium">
                 <Link
-                href="/pendaftaran"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                className="text-white font-bold hover:underline transition-colors drop-shadow-sm"
-              >
-                Daftar sekarang
-              </Link>
+                  href="/pendaftaran"
+                  className="text-white font-bold hover:underline transition-colors drop-shadow-sm"
+                >
+                  Daftar sekarang
+                </Link>
               </p>
-            </div>
-
-            <div className="pt-6 text-center border-t border-white/10">
-              <button
-                type="button"
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      "Apakah Anda yakin ingin menghapus semua data pendaftaran lokal?",
-                    )
-                  ) {
-                    localStorage.clear();
-                    alert("Semua data pendaftaran dan sesi telah dibersihkan!");
-                    window.location.reload();
-                  }
-                }}
-                className="text-[10px] text-white/40 hover:text-red-400 font-bold uppercase tracking-widest transition-colors"
-              >
-                [Reset Local Storage]
-              </button>
             </div>
           </form>
         </div>

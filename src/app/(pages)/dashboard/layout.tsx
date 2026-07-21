@@ -207,24 +207,7 @@ export default function DashboardLayout({
                   label="Poster"
                 />
               )}
-              {/* Debug Time Bypass in Sidebar */}
-              <div className="pt-8 pb-3 relative">
-                <div className="absolute inset-0 top-1/2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                <p className="relative z-10 bg-transparent inline-block px-3 text-[10px] font-black text-white/50 uppercase tracking-widest mx-2 backdrop-blur-sm rounded-full">
-                  Debug Waktu
-                </p>
-              </div>
-              <div className="px-2">
-                <select
-                  value={bypass || ""}
-                  onChange={(e) => handleBypass(e.target.value || null)}
-                  className="w-full bg-white/10 text-white/70 text-xs font-bold rounded-lg p-2 border border-white/20 outline-none focus:border-white/40 appearance-none cursor-pointer"
-                >
-                  <option value="" className="text-black">Normal</option>
-                  <option value="1" className="text-black">Tahap 2 (Fullpaper)</option>
-                  <option value="2" className="text-black">Tahap 3 (Final/PPT)</option>
-                </select>
-              </div>
+
             </>
           )}
 

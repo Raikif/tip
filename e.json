@@ -106,6 +106,29 @@
       }
     }
   },
+  "peserta": {
+    "Dummy Poster Team": {
+      "category": "poster",
+      "teamName": "Dummy Poster Team",
+      "institution": "Universitas Dummy",
+      "leaderName": "Ketua Dummy",
+      "leaderNim": "123456789",
+      "leaderWa": "08123456789",
+      "leaderEmail": "poster@dummy.com",
+      "leaderPassword": "$2b$10$ouyFE/enotMHl.DygasX4.J.XxWAg00KsgnJYQdteE978CGXys8Dq",
+      "member1Name": "",
+      "member1Nim": "",
+      "member1Wa": "",
+      "member1Email": "",
+      "member2Name": "",
+      "member2Nim": "",
+      "member2Wa": "",
+      "member2Email": "",
+      "registeredAt": "2026-07-21T00:00:00.000Z",
+      "status": "pending",
+      "ipAddress": "127.0.0.1"
+    }
+  },
   "users": {
     "admin1": {
       "email": "email@gmail.com",

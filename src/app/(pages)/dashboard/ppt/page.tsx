@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Presentation } from "lucide-react";
 import { useSessionUser } from "@/app/(utils)/hooks/useSessionUser";
 import { useTimeLock } from "@/app/(utils)/hooks/useTimeLock";
@@ -21,6 +21,17 @@ export default function PPTPage() {
   const [link, setLink] = useState("");
   const [file, setFile] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function loadTeam() {
+      const { getMyTeam } = await import("@/app/lib/action/auth");
+      const team = await getMyTeam();
+      if (team && team.ppt) {
+        setSubmitted(true);
+      }
+    }
+    loadTeam();
+  }, []);
 
   if (!user) return <div className="p-8">Memuat halaman...</div>;
   if (isLocked) {
@@ -68,7 +79,7 @@ export default function PPTPage() {
 
           <div className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <FileDropUpload label="Atau Upload File PPT" accept=".pptx,.pdf" maxSizeMB={20} teamName={user.user_name} stage="final" onUpload={setFile} />
+              <FileDropUpload label="Atau Upload File PPT" accept=".pptx,.pdf" maxSizeMB={4} teamName={user.user_name} stage="final" onUpload={setFile} />
             </div>
           </div>
 

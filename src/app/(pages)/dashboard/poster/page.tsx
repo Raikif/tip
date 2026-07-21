@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Image as ImageIcon } from "lucide-react";
 import { useSessionUser } from "@/app/(utils)/hooks/useSessionUser";
 import { useTimeLock } from "@/app/(utils)/hooks/useTimeLock";
@@ -30,10 +30,22 @@ export default function PosterPage() {
   const [subtema, setSubtema] = useState("");
   const [title, setTitle] = useState("");
   const [file, setFile] = useState<any>(null);
+  const [deskripsi, setDeskripsi] = useState<any>(null);
   const [biodata, setBiodata] = useState<any>(null);
   const [orisinalitas, setOrisinalitas] = useState<any>(null);
   const [buktiPembayaran, setBuktiPembayaran] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function loadTeam() {
+      const { getMyTeam } = await import("@/app/lib/action/auth");
+      const team = await getMyTeam();
+      if (team && team.poster) {
+        setSubmitted(true);
+      }
+    }
+    loadTeam();
+  }, []);
 
   const waveInfo = getCurrentWaveInfo(user?.category || "poster");
 
@@ -48,7 +60,7 @@ export default function PosterPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!file || !biodata || !orisinalitas || !buktiPembayaran) return;
+    if (!file || !biodata || !orisinalitas || !buktiPembayaran || !deskripsi) return;
     setLoading(true);
     try {
       const { submitPoster } = await import("@/app/lib/action/submissions");
@@ -60,6 +72,7 @@ export default function PosterPage() {
         biodata,
         orisinalitas,
         buktiPembayaran,
+        deskripsi,
       });
       if (res.ok) setSubmitted(true);
     } finally {
@@ -103,7 +116,8 @@ export default function PosterPage() {
           <Input label="Judul Poster" placeholder="Ketik judul poster karya Anda" variant="glass" required value={title} onChange={(e) => setTitle(e.target.value)} />
 
           <div className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FileDropUpload label="Upload Desain Poster" accept="image/*" maxSizeMB={10} teamName={user.user_name} stage="penyisihan" onUpload={setFile} />
+            <FileDropUpload label="Upload Desain Poster" accept="image/*" maxSizeMB={4} teamName={user.user_name} stage="penyisihan" onUpload={setFile} />
+            <FileDropUpload label="Upload Deskripsi Poster" accept=".pdf" maxSizeMB={2} teamName={user.user_name} stage="penyisihan" onUpload={setDeskripsi} />
             <FileDropUpload label="Upload Biodata" accept=".pdf" maxSizeMB={2} teamName={user.user_name} stage="penyisihan" onUpload={setBiodata} />
             <FileDropUpload label="Upload Lembar Orisinalitas" accept=".pdf" maxSizeMB={2} teamName={user.user_name} stage="penyisihan" onUpload={setOrisinalitas} />
           </div>
@@ -123,7 +137,7 @@ export default function PosterPage() {
           </div>
 
           <div className="pt-6 border-t border-white/20 mt-8">
-            <Button type="submit" fullWidth disabled={loading || !file || !biodata || !orisinalitas || !buktiPembayaran}
+            <Button type="submit" fullWidth disabled={loading || !file || !biodata || !orisinalitas || !buktiPembayaran || !deskripsi}
               className="bg-white/20 border border-white/30 text-white font-bold hover:bg-white/30 hover:-translate-y-1 py-4 rounded-[1.2rem] shadow-[0_10px_20px_rgba(0,0,0,0.1)] transition-all duration-300"
             >
               {loading ? "Mengirim..." : "Kirim Poster"}
