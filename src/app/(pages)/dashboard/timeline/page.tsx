@@ -39,6 +39,13 @@ function fromDateTimeLocal(value: string | number | undefined): string {
   return `${String(value)}:00+07:00`;
 }
 
+function toTimestamp(value: string | number | undefined): number | undefined {
+  if (!value && value !== 0) return undefined;
+  const str = typeof value === "number" ? new Date(value).toISOString() : value;
+  const time = new Date(str).getTime();
+  return Number.isNaN(time) ? undefined : time;
+}
+
 function formatDateTime(iso?: string | number): string {
   if (!iso && iso !== 0) return "-";
   const str = typeof iso === "number" ? new Date(iso).toISOString() : iso;
@@ -177,6 +184,8 @@ export default function AdminTimelinePage() {
         order: form.order,
         startsAt: fromDateTimeLocal(form.startsAt ?? ""),
         endsAt: fromDateTimeLocal(form.endsAt ?? ""),
+        start: toTimestamp(form.startsAt),
+        end: toTimestamp(form.endsAt),
         time: fromDateTimeLocal((form.time as string | undefined) ?? ""),
         countdownTitle: form.countdownTitle || undefined,
       };
