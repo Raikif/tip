@@ -1,15 +1,12 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState } from "react";
 import { Input } from "@/app/(utils)/components/ui/Input";
 import { Button } from "@/app/(utils)/components/ui/Button";
 import {
   Check,
   ChevronRight,
   FileImage,
-  CreditCard,
-  Lock,
   Info,
   AlertTriangle,
 } from "lucide-react";
@@ -26,23 +23,11 @@ function formatMs(ms: number): string {
   return `${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-function RegistrationPageInner({ passParam }: { passParam: string | null }) {
+export default function RegistrationPage() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [isTimeLocked, setIsTimeLocked] = useState(false);
-  const [lockDates, setLockDates] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const { timeline } = useEventTimeline();
-
-  useEffect(() => {
-    const expectedPass = process.env.NEXT_PUBLIC_ADMIN_BYPASS_PASS;
-    if (expectedPass && passParam === expectedPass) {
-      setIsTimeLocked(false);
-      return;
-    }
-    setIsTimeLocked(true);
-    setLockDates("21 Juli 2026 hingga 31 Agustus 2026");
-  }, [passParam]);
 
   const [formData, setFormData] = useState({
     category: "",
@@ -281,30 +266,6 @@ function RegistrationPageInner({ passParam }: { passParam: string | null }) {
       setIsLoading(false);
     }
   };
-
-  const ketuaKtmRef = React.useRef<HTMLInputElement | null>(null);
-  const anggota1Ref = React.useRef<HTMLInputElement | null>(null);
-  const anggota2Ref = React.useRef<HTMLInputElement | null>(null);
-
-  if (isTimeLocked) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-24 h-24 bg-slate-200 text-slate-500 rounded-full flex items-center justify-center mb-6">
-          <Lock size={48} />
-        </div>
-        <h1 className="text-3xl font-bold text-slate-800 mb-4">
-          Pendaftaran Belum Dibuka / Telah Ditutup
-        </h1>
-        <p className="text-slate-600 max-w-md">
-          Pendaftaran dibuka mulai {lockDates || "21 Juli 2026 hingga 31 Agustus 2026"}. Silakan
-          periksa kembali jadwal kegiatan (Timeline).
-        </p>
-        <Link href="/">
-          <Button className="mt-8">Kembali ke Beranda</Button>
-        </Link>
-      </div>
-    );
-  }
 
   const FileUploadItem = ({ title, desc, field, isRequired }: { title: string; desc: string; field: keyof typeof files; isRequired?: boolean }) => {
     return (
@@ -721,41 +682,5 @@ function RegistrationPageInner({ passParam }: { passParam: string | null }) {
         </div>
       </div>
     </div>
-  );
-}
-
-function RegistrationSkeleton() {
-  return (
-    <div className="min-h-screen pt-28 pb-12 px-4 md:px-8 relative">
-      <div className="max-w-4xl mx-auto relative z-10">
-        <div className="max-w-3xl mx-auto bg-white/10 backdrop-blur-3xl rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-white/20 overflow-hidden relative z-10">
-          <div className="bg-white/5 px-8 py-10 text-white relative border-b border-white/10">
-            <div className="h-4 bg-white/10 rounded w-32 mb-4 animate-pulse" />
-            <div className="h-10 bg-white/10 rounded w-64 animate-pulse" />
-          </div>
-          <div className="p-8 md:p-10 space-y-6">
-            <div className="h-32 bg-white/5 rounded-2xl animate-pulse" />
-            <div className="h-32 bg-white/5 rounded-2xl animate-pulse" />
-            <div className="h-32 bg-white/5 rounded-2xl animate-pulse" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RegistrationSearchParams({ children }: { children: (passParam: string | null) => React.ReactNode }) {
-  const searchParams = useSearchParams();
-  const passParam = searchParams.get("pass");
-  return <>{children(passParam)}</>;
-}
-
-export default function RegistrationPage() {
-  return (
-    <Suspense fallback={<RegistrationSkeleton />}>
-      <RegistrationSearchParams>
-        {(passParam) => <RegistrationPageInner passParam={passParam} />}
-      </RegistrationSearchParams>
-    </Suspense>
   );
 }
