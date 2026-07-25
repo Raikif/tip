@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Pencil, Trash2 } from "lucide-react";
 
 export default function AdminTeamsPage() {
   const [teams, setTeams] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [actionMsg, setActionMsg] = useState("");
+  const [actionErr, setActionErr] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -33,11 +35,41 @@ export default function AdminTeamsPage() {
     rejected: "text-red-300 bg-red-500/20 border-red-400/30",
   };
 
+  async function handleDelete(teamName: string) {
+    if (!confirm(`Hapus tim "${teamName}"? Data yang dihapus tidak dapat dikembalikan.`)) return;
+    setActionErr("");
+    setActionMsg("");
+    try {
+      const { deleteTeam } = await import("@/app/lib/action/users");
+      const res = await deleteTeam(teamName);
+      if (res.ok) {
+        setActionMsg(`Tim "${teamName}" berhasil dihapus.`);
+        setTeams((prev) => prev.filter((t) => t.teamName !== teamName));
+        setTimeout(() => setActionMsg(""), 3000);
+      } else {
+        setActionErr(res.error || "Gagal menghapus tim.");
+      }
+    } catch {
+      setActionErr("Terjadi kesalahan server.");
+    }
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-300 drop-shadow-md pb-1">
         Semua Tim
       </h1>
+
+      {actionMsg && (
+        <div className="bg-green-500/20 text-green-100 border border-green-400/30 p-4 rounded-xl text-sm font-medium">
+          {actionMsg}
+        </div>
+      )}
+      {actionErr && (
+        <div className="bg-red-500/20 text-red-100 border border-red-400/30 p-4 rounded-xl text-sm font-medium">
+          {actionErr}
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
@@ -94,10 +126,25 @@ export default function AdminTeamsPage() {
                       {team.status || "pending"}
                     </span>
                   </td>
-                  <td className="p-4 text-right">
+                  <td className="p-4 text-right flex gap-2 justify-end">
                     <Link
-                      href={`/dashboard/teams/${team.teamName}`}
-                      className="text-yellow-300 hover:text-yellow-100 font-bold text-sm transition-colors"
+                      href={`/dashboard/teams/${encodeURIComponent(team.teamName)}/edit`}
+                      className="p-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 transition-all"
+                      title="Edit"
+                    >
+                      <Pencil size={16} />
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(team.teamName)}
+                      className="p-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 transition-all"
+                      title="Hapus"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                    <Link
+                      href={`/dashboard/teams/${encodeURIComponent(team.teamName)}`}
+                      className="p-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white/70 transition-all"
+                      title="Detail"
                     >
                       Detail
                     </Link>

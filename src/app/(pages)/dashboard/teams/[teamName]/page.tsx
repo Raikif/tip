@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { ArrowLeft, CheckCircle, XCircle, Eye } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, Eye, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminTeamDetailPage() {
@@ -11,6 +11,7 @@ export default function AdminTeamDetailPage() {
   const teamName = rawTeamName ? decodeURIComponent(rawTeamName) : "";
   const [team, setTeam] = useState<any>(null);
   const [actionMsg, setActionMsg] = useState("");
+  const [err, setErr] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -33,6 +34,26 @@ export default function AdminTeamDetailPage() {
     }
   };
 
+  async function handleDelete() {
+    if (!confirm(`Hapus tim "${teamName}"? Data yang dihapus tidak dapat dikembalikan dan peserta dapat mendaftar ulang dengan IP yang sama.`)) return;
+    setErr("");
+    setActionMsg("");
+    try {
+      const { deleteTeam } = await import("@/app/lib/action/users");
+      const res = await deleteTeam(teamName);
+      if (res.ok) {
+        setActionMsg(`Tim "${teamName}" berhasil dihapus. Mengalihkan...`);
+        setTimeout(() => {
+          window.location.href = "/dashboard/teams";
+        }, 1200);
+      } else {
+        setErr(res.error || "Gagal menghapus tim.");
+      }
+    } catch {
+      setErr("Terjadi kesalahan server.");
+    }
+  }
+
   if (!team) {
     return <div className="p-8 text-white/80">Memuat data tim...</div>;
   }
@@ -54,6 +75,11 @@ export default function AdminTeamDetailPage() {
       {actionMsg && (
         <div className="bg-green-500/20 text-green-100 border border-green-400/30 p-4 rounded-xl text-sm font-medium">
           {actionMsg}
+        </div>
+      )}
+      {err && (
+        <div className="bg-red-500/20 text-red-100 border border-red-400/30 p-4 rounded-xl text-sm font-medium">
+          {err}
         </div>
       )}
 
@@ -196,6 +222,23 @@ export default function AdminTeamDetailPage() {
           )}
         </div>
       )}
+
+      <div className="flex flex-wrap gap-3 pt-2">
+        <Link
+          href={`/dashboard/teams/${encodeURIComponent(teamName)}/edit`}
+          className="flex items-center gap-2 px-5 py-2.5 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 text-blue-300 font-bold rounded-[1rem] transition-all"
+        >
+          <Pencil size={18} />
+          Edit
+        </Link>
+        <button
+          onClick={handleDelete}
+          className="flex items-center gap-2 px-5 py-2.5 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 font-bold rounded-[1rem] transition-all"
+        >
+          <Trash2 size={18} />
+          Hapus
+        </button>
+      </div>
 
       <div className="flex gap-4 pt-4">
         <button

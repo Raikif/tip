@@ -101,7 +101,7 @@ export async function getAllTeams() {
   await requireAdmin();
 
   const db = getFirebaseAdminDb();
-  if (!db) return []; // Fallback for when DB is mocked and returns null. Note that my db mock doesn't actually return null, but just in case.
+  if (!db) return [];
   const snapshot = await db.ref("peserta").once("value");
   const data = snapshot.val() as Record<string, any> | null;
   if (!data) return [];
@@ -109,4 +109,63 @@ export async function getAllTeams() {
     teamName,
     ...(team as Record<string, any>),
   })) as Array<{ teamName: string; status?: string; category?: string; [key: string]: any }>;
+}
+
+export async function getTeamByTeamName(teamName: string) {
+  await requireAdmin();
+
+  const db = getFirebaseAdminDb();
+  const snapshot = await db.ref(`peserta/${teamName}`).once("value");
+  const data = snapshot.val() as Record<string, any> | null;
+  if (!data) return null;
+  return { teamName, ...data } as { teamName: string; [key: string]: any };
+}
+
+const TEAM_EDITABLE_FIELDS = [
+  "category",
+  "institution",
+  "leaderName",
+  "leaderNim",
+  "leaderWa",
+  "leaderEmail",
+  "member1Name",
+  "member1Nim",
+  "member1Wa",
+  "member1Email",
+  "member2Name",
+  "member2Nim",
+  "member2Wa",
+  "member2Email",
+  "status",
+] as const;
+
+export async function updateTeam(teamName: string, data: Record<string, any>) {
+  await requireAdmin();
+
+  const db = getFirebaseAdminDb();
+  const snapshot = await db.ref(`peserta/${teamName}`).once("value");
+  if (!snapshot.exists()) return { ok: false, error: "Tim tidak ditemukan" };
+
+  const updates: Record<string, any> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if ((TEAM_EDITABLE_FIELDS as readonly string[]).includes(key)) {
+      updates[key] = value;
+    }
+  }
+
+  if (Object.keys(updates).length === 0) return { ok: true };
+
+  await db.ref(`peserta/${teamName}`).update(updates);
+  return { ok: true };
+}
+
+export async function deleteTeam(teamName: string) {
+  await requireAdmin();
+
+  const db = getFirebaseAdminDb();
+  const snapshot = await db.ref(`peserta/${teamName}`).once("value");
+  if (!snapshot.exists()) return { ok: false, error: "Tim tidak ditemukan" };
+
+  await db.ref(`peserta/${teamName}`).remove();
+  return { ok: true };
 }
