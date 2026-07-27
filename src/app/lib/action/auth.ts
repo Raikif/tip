@@ -6,6 +6,13 @@ import { createSession } from "../server/auth/sessions";
 import { loginFormSchema } from "@/app/(utils)/zod/auth";
 import { headers } from "next/headers";
 
+type UploadedFile = {
+  url: string;
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+};
+
 export async function loginUser(formData: FormData) {
   try {
     const val = loginFormSchema.safeParse(Object.fromEntries(formData));
@@ -94,18 +101,18 @@ export async function registerUser(data: {
   member2Nim?: string;
   member2Wa?: string;
   member2Email?: string;
-  leaderKtmFile?: any;
-  member1KtmFile?: any;
-  member2KtmFile?: any;
-  ketuaFollowIgFile?: any;
-  ketuaStoryIgFile?: any;
-  ketuaTwibbonFile?: any;
-  anggota1FollowIgFile?: any;
-  anggota1StoryIgFile?: any;
-  anggota1TwibbonFile?: any;
-  anggota2FollowIgFile?: any;
-  anggota2StoryIgFile?: any;
-  anggota2TwibbonFile?: any;
+  leaderKtmFile?: UploadedFile | null;
+  member1KtmFile?: UploadedFile | null;
+  member2KtmFile?: UploadedFile | null;
+  ketuaFollowIgFile?: UploadedFile | null;
+  ketuaStoryIgFile?: UploadedFile | null;
+  ketuaTwibbonFile?: UploadedFile | null;
+  anggota1FollowIgFile?: UploadedFile | null;
+  anggota1StoryIgFile?: UploadedFile | null;
+  anggota1TwibbonFile?: UploadedFile | null;
+  anggota2FollowIgFile?: UploadedFile | null;
+  anggota2StoryIgFile?: UploadedFile | null;
+  anggota2TwibbonFile?: UploadedFile | null;
 }) {
   try {
     const db = getFirebaseAdminDb();
@@ -116,11 +123,14 @@ export async function registerUser(data: {
       "unknown";
 
     const pesertaSnapshot = await db.ref("peserta").once("value");
-    const peserta = pesertaSnapshot.val() as Record<string, any> | null;
+    const peserta = pesertaSnapshot.val() as Record<string, {
+      ipAddress?: string;
+      teamName?: string;
+    }> | null;
 
     if (peserta) {
       const alreadyRegistered = Object.values(peserta).find(
-        (item: any) => item.ipAddress === clientIp,
+        (item: { ipAddress?: string }) => item.ipAddress === clientIp,
       );
       if (alreadyRegistered) {
         return {

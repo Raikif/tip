@@ -12,9 +12,6 @@ export default function CompetitionSection() {
   const headerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
 
-  useGsapAnimation(headerRef.current ?? null, "up", 0.8);
-  useGsapAnimation(cardsRef.current ?? null, "up", 0.9, 0.2);
-
   useEffect(() => {
     if (!cardsRef.current) return;
     const cards = cardsRef.current.querySelectorAll("[data-comp-card]");

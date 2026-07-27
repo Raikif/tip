@@ -116,10 +116,6 @@ export default function TimelineSection() {
   const tabsRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
 
-  useGsapAnimation(headerRef.current ?? null, "up", 0.8);
-  useGsapAnimation(tabsRef.current ?? null, "fade", 0.6, 0.2);
-  useGsapAnimation(timelineRef.current ?? null, "up", 0.9, 0.3);
-
   useEffect(() => {
     if (!timelineRef.current || loading) return;
     const items = timelineRef.current.querySelectorAll("[data-timeline-item]");

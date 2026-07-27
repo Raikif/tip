@@ -14,34 +14,30 @@ export function useTimeLock(
   useEffect(() => {
     if (loading || !timeline) return;
 
+    // Compute the final locked state
+    let newLockedState = true;
+
     const bypass = localStorage.getItem("debug_time_bypass");
     if (bypass === "1" || bypass === "2") {
-      setIsLocked(false);
-      return;
-    }
-
-    const cat = timeline[category as keyof typeof timeline];
-    if (!cat) {
-      setIsLocked(true);
-      return;
-    }
-
-    const stage = cat[stageKey];
-    if (!stage) {
-      setIsLocked(true);
-      return;
-    }
-
-    const now = Date.now();
-
-    if (stage.start !== undefined && stage.end !== undefined) {
-      setIsLocked(now < stage.start || now > stage.end);
-    } else if (stage.time !== undefined) {
-      const timeNum = typeof stage.time === "string" ? new Date(stage.time).getTime() : stage.time;
-      setIsLocked(now < timeNum);
+      newLockedState = false;
     } else {
-      setIsLocked(true);
+      const cat = timeline[category as keyof typeof timeline];
+      if (cat) {
+        const stage = cat[stageKey];
+        if (stage) {
+          const now = Date.now();
+          if (stage.start !== undefined && stage.end !== undefined) {
+            newLockedState = now < stage.start || now > stage.end;
+          } else if (stage.time !== undefined) {
+            const timeNum = typeof stage.time === "string" ? new Date(stage.time).getTime() : stage.time;
+            newLockedState = now < timeNum;
+          }
+        }
+      }
     }
+
+    // Call setState once with the final value
+    setIsLocked(newLockedState);
   }, [timeline, loading, category, stageKey]);
 
   const lockMessage = getLockMessage(category, String(stageKey));
