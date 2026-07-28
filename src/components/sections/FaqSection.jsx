@@ -61,7 +61,7 @@ function QuestionCard({ question }) {
 
 export default function FaqSection() {
   function openWhatsApp() {
-    const phoneNumber = "895339449359";
+    const phoneNumber = "6282259864141";
     const message =
       "Halo Kak, saya ingin bertanya mengenai pelaksanaan lomba.";
 

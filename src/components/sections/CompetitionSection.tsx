@@ -79,6 +79,9 @@ export default function CompetitionSection() {
             </p>
             <ul className="space-y-2 mb-8 text-sm text-slate-600">
               <li className="flex items-center gap-2">
+                ✓ Pengumpulan abstrak <span className="text-[var(--color-brand-purple)] font-semibold">GRATIS</span>
+              </li>
+              <li className="flex items-center gap-2">
                 ✓ Tema inovasi teknologi
               </li>
               <li className="flex items-center gap-2">

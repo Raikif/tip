@@ -177,7 +177,6 @@ export default function DashboardLayout({
                     icon={<FileText size={22} />}
                     label="Abstrak"
                     subtitle={(isFullpaper || isFinal) ? "Lolos / Disubmit" : undefined}
-                    disabled={isFullpaper || isFinal}
                   />
                   {(isFullpaper || isFinal) && (
                     <NavLink

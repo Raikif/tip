@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import { Image as ImageIcon } from "lucide-react";
 import { useSessionUser } from "@/app/(utils)/hooks/useSessionUser";
-import { useTimeLock } from "@/app/(utils)/hooks/useTimeLock";
-import { Warnscreen } from "@/app/(utils)/components/ui/Warnscreen";
 import { SubmitSuccess } from "@/app/(utils)/components/ui/SubmitSuccess";
 import { FileDropUpload } from "@/app/(utils)/components/ui/FileDropUpload";
 import { Input } from "@/app/(utils)/components/ui/Input";
@@ -21,10 +19,6 @@ const THEMES_POSTER = [
 
 export default function PosterPage() {
   const user = useSessionUser();
-  const { isLocked, lockMessage } = useTimeLock(
-    user?.category || "poster",
-    "pengumpulan_poster",
-  );
 
   const [submitted, setSubmitted] = useState(false);
   const [subtema, setSubtema] = useState("");
@@ -50,13 +44,6 @@ export default function PosterPage() {
   const waveInfo = getCurrentWaveInfo(user?.category || "poster");
 
   if (!user) return <div className="p-8">Memuat halaman...</div>;
-  if (isLocked) {
-    return (
-      <Warnscreen title="Pengumpulan Poster Belum Dibuka">
-        {lockMessage}
-      </Warnscreen>
-    );
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
