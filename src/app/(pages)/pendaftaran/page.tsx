@@ -17,8 +17,18 @@ function formatMs(ms: number): string {
   const d = new Date(ms);
   const day = d.getDate();
   const months = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-    "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
   ];
   return `${day} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
@@ -86,15 +96,9 @@ export default function RegistrationPage() {
     (field: keyof typeof files) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0] ?? null;
       if (file) {
-        const allowedTypes = [
-          "application/pdf",
-          "image/jpeg",
-          "image/png",
-        ];
+        const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
         if (!allowedTypes.includes(file.type)) {
-          setError(
-            "File hanya boleh berformat PDF, JPG, atau PNG",
-          );
+          setError("File hanya boleh berformat PDF, JPG, atau PNG");
           e.target.value = "";
           return;
         }
@@ -214,22 +218,69 @@ export default function RegistrationPage() {
       let anggota2TwibbonFile: any = null;
 
       try {
-        if (files.ketuaKtm) leaderKtmFile = await uploadFile(files.ketuaKtm, "ketua_ktm");
-        if (files.anggota1Ktm) member1KtmFile = await uploadFile(files.anggota1Ktm, "anggota1_ktm");
-        if (files.anggota2Ktm) member2KtmFile = await uploadFile(files.anggota2Ktm, "anggota2_ktm");
-        if (files.ketuaFollowIg) ketuaFollowIgFile = await uploadFile(files.ketuaFollowIg, "ketua_follow_ig");
-        if (files.ketuaStoryIg) ketuaStoryIgFile = await uploadFile(files.ketuaStoryIg, "ketua_story_ig");
-        if (files.ketuaTwibbon) ketuaTwibbonFile = await uploadFile(files.ketuaTwibbon, "ketua_twibbon");
-        if (files.anggota1FollowIg) anggota1FollowIgFile = await uploadFile(files.anggota1FollowIg, "anggota1_follow_ig");
-        if (files.anggota1StoryIg) anggota1StoryIgFile = await uploadFile(files.anggota1StoryIg, "anggota1_story_ig");
-        if (files.anggota1Twibbon) anggota1TwibbonFile = await uploadFile(files.anggota1Twibbon, "anggota1_twibbon");
-        if (files.anggota2FollowIg) anggota2FollowIgFile = await uploadFile(files.anggota2FollowIg, "anggota2_follow_ig");
-        if (files.anggota2StoryIg) anggota2StoryIgFile = await uploadFile(files.anggota2StoryIg, "anggota2_story_ig");
-        if (files.anggota2Twibbon) anggota2TwibbonFile = await uploadFile(files.anggota2Twibbon, "anggota2_twibbon");
+        if (files.ketuaKtm)
+          leaderKtmFile = await uploadFile(files.ketuaKtm, "ketua_ktm");
+        if (files.anggota1Ktm)
+          member1KtmFile = await uploadFile(files.anggota1Ktm, "anggota1_ktm");
+        if (files.anggota2Ktm)
+          member2KtmFile = await uploadFile(files.anggota2Ktm, "anggota2_ktm");
+        if (files.ketuaFollowIg)
+          ketuaFollowIgFile = await uploadFile(
+            files.ketuaFollowIg,
+            "ketua_follow_ig",
+          );
+        if (files.ketuaStoryIg)
+          ketuaStoryIgFile = await uploadFile(
+            files.ketuaStoryIg,
+            "ketua_story_ig",
+          );
+        if (files.ketuaTwibbon)
+          ketuaTwibbonFile = await uploadFile(
+            files.ketuaTwibbon,
+            "ketua_twibbon",
+          );
+        if (files.anggota1FollowIg)
+          anggota1FollowIgFile = await uploadFile(
+            files.anggota1FollowIg,
+            "anggota1_follow_ig",
+          );
+        if (files.anggota1StoryIg)
+          anggota1StoryIgFile = await uploadFile(
+            files.anggota1StoryIg,
+            "anggota1_story_ig",
+          );
+        if (files.anggota1Twibbon)
+          anggota1TwibbonFile = await uploadFile(
+            files.anggota1Twibbon,
+            "anggota1_twibbon",
+          );
+        if (files.anggota2FollowIg)
+          anggota2FollowIgFile = await uploadFile(
+            files.anggota2FollowIg,
+            "anggota2_follow_ig",
+          );
+        if (files.anggota2StoryIg)
+          anggota2StoryIgFile = await uploadFile(
+            files.anggota2StoryIg,
+            "anggota2_story_ig",
+          );
+        if (files.anggota2Twibbon)
+          anggota2TwibbonFile = await uploadFile(
+            files.anggota2Twibbon,
+            "anggota2_twibbon",
+          );
       } catch (uploadErr) {
-        const message =
-          uploadErr instanceof Error ? uploadErr.message : "Gagal upload file.";
-        setError(message);
+        console.error("[SERVER?] Upload Error:", uploadErr);
+        let contact = "";
+        if (formData.category === "lkti") {
+          contact = "085815849940 (Andin)";
+        } else if (formData.category === "essay") {
+          contact = "085856439655 (Sarah)";
+        } else if (formData.category === "poster") {
+          contact = "082259864141 (Kahe)";
+        }
+
+        setError("Bermasalah? Silahkan hubungi nomor ini: " + contact);
         setIsLoading(false);
         return;
       }
@@ -260,14 +311,32 @@ export default function RegistrationPage() {
       setCurrentStep(3);
       setIsLoading(false);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Terjadi kesalahan.";
       console.error("[CLIENT] Submit error:", err);
-      setError(message);
+      let contact = "";
+      if (formData.category === "lkti") {
+        contact = "085815849940 (Andin)";
+      } else if (formData.category === "essay") {
+        contact = "085856439655 (Sarah)";
+      } else if (formData.category === "poster") {
+        contact = "082259864141 (Kahe)";
+      }
+
+      setError("Bermasalah? Silahkan hubungi nomor ini: " + contact);
       setIsLoading(false);
     }
   };
 
-  const FileUploadItem = ({ title, desc, field, isRequired }: { title: string; desc: string; field: keyof typeof files; isRequired?: boolean }) => {
+  const FileUploadItem = ({
+    title,
+    desc,
+    field,
+    isRequired,
+  }: {
+    title: string;
+    desc: string;
+    field: keyof typeof files;
+    isRequired?: boolean;
+  }) => {
     return (
       <label className="border border-dashed border-white/30 bg-white/5 rounded-[1.2rem] p-5 text-center hover:bg-white/10 hover:border-white/50 transition-all duration-300 cursor-pointer group mt-4 shadow-sm backdrop-blur-sm block">
         <div className="w-14 h-14 bg-white/20 text-white rounded-[1rem] flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform shadow-inner border border-white/20">
@@ -277,7 +346,10 @@ export default function RegistrationPage() {
           {title}
         </p>
         <p className="text-xs text-white/60 mt-1 font-medium">
-          {desc} {isRequired ? "(Wajib, PDF/JPG/PNG, maks. 1MB)" : "(Opsional, PDF/JPG/PNG, maks. 1MB)"}
+          {desc}{" "}
+          {isRequired
+            ? "(Wajib, PDF/JPG/PNG, maks. 1MB)"
+            : "(Opsional, PDF/JPG/PNG, maks. 1MB)"}
         </p>
         {files[field] && (
           <p className="text-xs text-green-300 mt-2 font-medium">
@@ -350,10 +422,15 @@ export default function RegistrationPage() {
           <form onSubmit={handleSubmit} className="p-8 md:p-10 relative">
             {currentStep < 3 && (
               <div className="bg-red-500/20 border border-red-400/60 text-red-100 p-5 rounded-2xl text-sm shadow-sm backdrop-blur-md font-semibold flex items-start gap-4 relative z-10 mb-8">
-                <AlertTriangle className="shrink-0 mt-0.5 text-red-300" size={22} />
+                <AlertTriangle
+                  className="shrink-0 mt-0.5 text-red-300"
+                  size={22}
+                />
                 <p>
-                  Setiap alamat IP hanya dapat melakukan pendaftaran <span className="font-bold text-red-200">satu kali</span>.
-                  Pastikan semua data yang dimasukkan sudah benar sebelum melanjutkan.
+                  Setiap alamat IP hanya dapat melakukan pendaftaran{" "}
+                  <span className="font-bold text-red-200">satu kali</span>.
+                  Pastikan semua data yang dimasukkan sudah benar sebelum
+                  melanjutkan.
                 </p>
               </div>
             )}
@@ -483,10 +560,30 @@ export default function RegistrationPage() {
                         required
                       />
                     </div>
-                    <FileUploadItem title="Upload Scan Kartu Pelajar/Mahasiswa" desc="Ketua Tim" field="ketuaKtm" isRequired={true} />
-                    <FileUploadItem title="Upload Bukti Follow IG" desc="Ketua Tim" field="ketuaFollowIg" isRequired={true} />
-                    <FileUploadItem title="Upload Bukti Story IG" desc="Ketua Tim" field="ketuaStoryIg" isRequired={true} />
-                    <FileUploadItem title="Upload Bukti Twibbon" desc="Ketua Tim" field="ketuaTwibbon" isRequired={true} />
+                    <FileUploadItem
+                      title="Upload Scan Kartu Pelajar/Mahasiswa"
+                      desc="Ketua Tim"
+                      field="ketuaKtm"
+                      isRequired={true}
+                    />
+                    <FileUploadItem
+                      title="Upload Bukti Follow IG"
+                      desc="Ketua Tim"
+                      field="ketuaFollowIg"
+                      isRequired={true}
+                    />
+                    <FileUploadItem
+                      title="Upload Bukti Story IG"
+                      desc="Ketua Tim"
+                      field="ketuaStoryIg"
+                      isRequired={true}
+                    />
+                    <FileUploadItem
+                      title="Upload Bukti Twibbon"
+                      desc="Ketua Tim"
+                      field="ketuaTwibbon"
+                      isRequired={true}
+                    />
                   </div>
                 </div>
 
@@ -540,10 +637,26 @@ export default function RegistrationPage() {
                         variant="glass"
                       />
                     </div>
-                    <FileUploadItem title="Upload Scan Kartu Pelajar/Mahasiswa" desc="Anggota 1" field="anggota1Ktm" />
-                    <FileUploadItem title="Upload Bukti Follow IG" desc="Anggota 1" field="anggota1FollowIg" />
-                    <FileUploadItem title="Upload Bukti Story IG" desc="Anggota 1" field="anggota1StoryIg" />
-                    <FileUploadItem title="Upload Bukti Twibbon" desc="Anggota 1" field="anggota1Twibbon" />
+                    <FileUploadItem
+                      title="Upload Scan Kartu Pelajar/Mahasiswa"
+                      desc="Anggota 1"
+                      field="anggota1Ktm"
+                    />
+                    <FileUploadItem
+                      title="Upload Bukti Follow IG"
+                      desc="Anggota 1"
+                      field="anggota1FollowIg"
+                    />
+                    <FileUploadItem
+                      title="Upload Bukti Story IG"
+                      desc="Anggota 1"
+                      field="anggota1StoryIg"
+                    />
+                    <FileUploadItem
+                      title="Upload Bukti Twibbon"
+                      desc="Anggota 1"
+                      field="anggota1Twibbon"
+                    />
                   </div>
                 </div>
 
@@ -597,10 +710,26 @@ export default function RegistrationPage() {
                         variant="glass"
                       />
                     </div>
-                    <FileUploadItem title="Upload Scan Kartu Pelajar/Mahasiswa" desc="Anggota 2" field="anggota2Ktm" />
-                    <FileUploadItem title="Upload Bukti Follow IG" desc="Anggota 2" field="anggota2FollowIg" />
-                    <FileUploadItem title="Upload Bukti Story IG" desc="Anggota 2" field="anggota2StoryIg" />
-                    <FileUploadItem title="Upload Bukti Twibbon" desc="Anggota 2" field="anggota2Twibbon" />
+                    <FileUploadItem
+                      title="Upload Scan Kartu Pelajar/Mahasiswa"
+                      desc="Anggota 2"
+                      field="anggota2Ktm"
+                    />
+                    <FileUploadItem
+                      title="Upload Bukti Follow IG"
+                      desc="Anggota 2"
+                      field="anggota2FollowIg"
+                    />
+                    <FileUploadItem
+                      title="Upload Bukti Story IG"
+                      desc="Anggota 2"
+                      field="anggota2StoryIg"
+                    />
+                    <FileUploadItem
+                      title="Upload Bukti Twibbon"
+                      desc="Anggota 2"
+                      field="anggota2Twibbon"
+                    />
                   </div>
                 </div>
               </div>
