@@ -42,7 +42,13 @@ export async function getUsers() {
   const snapshot = await db.ref("users").once("value");
   const data = snapshot.val() as Record<
     string,
-    { email: string; password: string; name: string; role: string; createdAt: string }
+    {
+      email: string;
+      password: string;
+      name: string;
+      role: string;
+      createdAt: string;
+    }
   > | null;
   if (!data) return [];
   return Object.entries(data).map(([id, u]) => ({
@@ -108,7 +114,7 @@ export async function getAllTeams() {
   return Object.entries(data).map(([teamName, team]) => ({
     teamName,
     ...(team as Record<string, any>),
-  })) as Array<{ teamName: string; status?: string; category?: string; [key: string]: any }>;
+  }));
 }
 
 export async function getTeamByTeamName(teamName: string) {
@@ -118,7 +124,7 @@ export async function getTeamByTeamName(teamName: string) {
   const snapshot = await db.ref(`peserta/${teamName}`).once("value");
   const data = snapshot.val() as Record<string, any> | null;
   if (!data) return null;
-  return { teamName, ...data } as { teamName: string; [key: string]: any };
+  return { teamName, ...data };
 }
 
 const TEAM_EDITABLE_FIELDS = [

@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { ArrowLeft, CheckCircle, XCircle, Eye, Pencil, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle,
+  XCircle,
+  Eye,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function AdminTeamDetailPage() {
@@ -29,13 +36,20 @@ export default function AdminTeamDetailPage() {
     const res = await updateTeamStatus(teamName, status);
     if (res.ok) {
       setTeam((prev: any) => ({ ...prev, status }));
-      setActionMsg(status === "verified" ? "Tim telah diverifikasi." : "Tim ditolak.");
+      setActionMsg(
+        status === "verified" ? "Tim telah diverifikasi." : "Tim ditolak.",
+      );
       setTimeout(() => setActionMsg(""), 3000);
     }
   };
 
   async function handleDelete() {
-    if (!confirm(`Hapus tim "${teamName}"? Data yang dihapus tidak dapat dikembalikan dan peserta dapat mendaftar ulang dengan IP yang sama.`)) return;
+    if (
+      !confirm(
+        `Hapus tim "${teamName}"? Data yang dihapus tidak dapat dikembalikan dan peserta dapat mendaftar ulang dengan IP yang sama.`,
+      )
+    )
+      return;
     setErr("");
     setActionMsg("");
     try {
@@ -91,7 +105,14 @@ export default function AdminTeamDetailPage() {
           <InfoRow label="Kategori" value={team.category} />
           <InfoRow label="Instansi" value={team.institution} />
           <InfoRow label="Status" value={team.status || "pending"} />
-          <InfoRow label="Tgl Daftar" value={team.registeredAt ? new Date(team.registeredAt).toLocaleDateString("id") : "-"} />
+          <InfoRow
+            label="Tgl Daftar"
+            value={
+              team.registeredAt
+                ? new Date(team.registeredAt).toLocaleDateString("id")
+                : "-"
+            }
+          />
         </div>
 
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[1.5rem] p-6 space-y-4">
@@ -103,7 +124,11 @@ export default function AdminTeamDetailPage() {
           <InfoRow label="Email" value={team.leaderEmail} />
           <InfoRow label="WA" value={team.leaderWa} />
           {team.leaderKtmFile?.url && (
-            <FileLink label="KTM" url={team.leaderKtmFile.url} fileName={team.leaderKtmFile.fileName} />
+            <FileLink
+              label="KTM"
+              url={team.leaderKtmFile.url}
+              fileName={team.leaderKtmFile.fileName}
+            />
           )}
         </div>
       </div>
@@ -118,7 +143,11 @@ export default function AdminTeamDetailPage() {
               <InfoRow label="Nama" value={team.member1Name} />
               <InfoRow label="NIM" value={team.member1Nim} />
               {team.member1KtmFile?.url && (
-                <FileLink label="KTM" url={team.member1KtmFile.url} fileName={team.member1KtmFile.fileName} />
+                <FileLink
+                  label="KTM"
+                  url={team.member1KtmFile.url}
+                  fileName={team.member1KtmFile.fileName}
+                />
               )}
             </div>
           )}
@@ -130,7 +159,11 @@ export default function AdminTeamDetailPage() {
               <InfoRow label="Nama" value={team.member2Name} />
               <InfoRow label="NIM" value={team.member2Nim} />
               {team.member2KtmFile?.url && (
-                <FileLink label="KTM" url={team.member2KtmFile.url} fileName={team.member2KtmFile.fileName} />
+                <FileLink
+                  label="KTM"
+                  url={team.member2KtmFile.url}
+                  fileName={team.member2KtmFile.fileName}
+                />
               )}
             </div>
           )}
@@ -142,7 +175,11 @@ export default function AdminTeamDetailPage() {
           <h2 className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-300 drop-shadow-sm pb-1">
             Pembayaran
           </h2>
-          <FileLink label="Bukti Pembayaran" url={team.buktiPembayaran.url} fileName={team.buktiPembayaran.fileName} />
+          <FileLink
+            label="Bukti Pembayaran"
+            url={team.buktiPembayaran.url}
+            fileName={team.buktiPembayaran.fileName}
+          />
         </div>
       )}
 
@@ -154,9 +191,20 @@ export default function AdminTeamDetailPage() {
           <InfoRow label="Judul" value={team.abstrak.title} />
           <InfoRow label="Subtema" value={team.abstrak.subtema} />
           <InfoRow label="Status" value={team.abstrak.status} />
-          <InfoRow label="Tgl Submit" value={team.abstrak.submittedAt ? new Date(team.abstrak.submittedAt).toLocaleString("id") : "-"} />
+          <InfoRow
+            label="Tgl Submit"
+            value={
+              team.abstrak.submittedAt
+                ? new Date(team.abstrak.submittedAt).toLocaleString("id")
+                : "-"
+            }
+          />
           {team.abstrak.file?.webViewLink && (
-            <FileLink label="File Abstrak" url={team.abstrak.file.webViewLink} fileName={team.abstrak.file.fileName} />
+            <FileLink
+              label="File Abstrak"
+              url={team.abstrak.file.webViewLink}
+              fileName={team.abstrak.file.fileName}
+            />
           )}
         </div>
       )}
@@ -169,21 +217,48 @@ export default function AdminTeamDetailPage() {
           <InfoRow label="Judul" value={team.poster.title} />
           <InfoRow label="Subtema" value={team.poster.subtema} />
           <InfoRow label="Status" value={team.poster.status} />
-          <InfoRow label="Tgl Submit" value={team.poster.submittedAt ? new Date(team.poster.submittedAt).toLocaleString("id") : "-"} />
+          <InfoRow
+            label="Tgl Submit"
+            value={
+              team.poster.submittedAt
+                ? new Date(team.poster.submittedAt).toLocaleString("id")
+                : "-"
+            }
+          />
           {team.poster.file?.webViewLink && (
-            <FileLink label="File Desain" url={team.poster.file.webViewLink} fileName={team.poster.file.fileName} />
+            <FileLink
+              label="File Desain"
+              url={team.poster.file.webViewLink}
+              fileName={team.poster.file.fileName}
+            />
           )}
           {team.poster.deskripsi?.webViewLink && (
-            <FileLink label="File Deskripsi" url={team.poster.deskripsi.webViewLink} fileName={team.poster.deskripsi.fileName} />
+            <FileLink
+              label="File Deskripsi"
+              url={team.poster.deskripsi.webViewLink}
+              fileName={team.poster.deskripsi.fileName}
+            />
           )}
           {team.poster.biodata?.webViewLink && (
-            <FileLink label="File Biodata" url={team.poster.biodata.webViewLink} fileName={team.poster.biodata.fileName} />
+            <FileLink
+              label="File Biodata"
+              url={team.poster.biodata.webViewLink}
+              fileName={team.poster.biodata.fileName}
+            />
           )}
           {team.poster.orisinalitas?.webViewLink && (
-            <FileLink label="Lembar Orisinalitas" url={team.poster.orisinalitas.webViewLink} fileName={team.poster.orisinalitas.fileName} />
+            <FileLink
+              label="Lembar Orisinalitas"
+              url={team.poster.orisinalitas.webViewLink}
+              fileName={team.poster.orisinalitas.fileName}
+            />
           )}
           {team.poster.buktiPembayaran?.webViewLink && (
-            <FileLink label="Bukti Pembayaran Poster" url={team.poster.buktiPembayaran.webViewLink} fileName={team.poster.buktiPembayaran.fileName} />
+            <FileLink
+              label="Bukti Pembayaran Poster"
+              url={team.poster.buktiPembayaran.webViewLink}
+              fileName={team.poster.buktiPembayaran.fileName}
+            />
           )}
         </div>
       )}
@@ -196,15 +271,34 @@ export default function AdminTeamDetailPage() {
           <InfoRow label="Judul" value={team.fullpaper.title} />
           <InfoRow label="Subtema" value={team.fullpaper.subtema} />
           <InfoRow label="Status" value={team.fullpaper.status} />
-          <InfoRow label="Tgl Submit" value={team.fullpaper.submittedAt ? new Date(team.fullpaper.submittedAt).toLocaleString("id") : "-"} />
+          <InfoRow
+            label="Tgl Submit"
+            value={
+              team.fullpaper.submittedAt
+                ? new Date(team.fullpaper.submittedAt).toLocaleString("id")
+                : "-"
+            }
+          />
           {team.fullpaper.file?.webViewLink && (
-            <FileLink label="File Fullpaper" url={team.fullpaper.file.webViewLink} fileName={team.fullpaper.file.fileName} />
+            <FileLink
+              label="File Fullpaper"
+              url={team.fullpaper.file.webViewLink}
+              fileName={team.fullpaper.file.fileName}
+            />
           )}
           {team.fullpaper.orisinalitas?.webViewLink && (
-            <FileLink label="Lembar Orisinalitas" url={team.fullpaper.orisinalitas.webViewLink} fileName={team.fullpaper.orisinalitas.fileName} />
+            <FileLink
+              label="Lembar Orisinalitas"
+              url={team.fullpaper.orisinalitas.webViewLink}
+              fileName={team.fullpaper.orisinalitas.fileName}
+            />
           )}
           {team.fullpaper.buktiPembayaran?.webViewLink && (
-            <FileLink label="Bukti Pembayaran" url={team.fullpaper.buktiPembayaran.webViewLink} fileName={team.fullpaper.buktiPembayaran.fileName} />
+            <FileLink
+              label="Bukti Pembayaran"
+              url={team.fullpaper.buktiPembayaran.webViewLink}
+              fileName={team.fullpaper.buktiPembayaran.fileName}
+            />
           )}
         </div>
       )}
@@ -216,9 +310,20 @@ export default function AdminTeamDetailPage() {
           </h2>
           <InfoRow label="Link" value={team.ppt.link} />
           <InfoRow label="Status" value={team.ppt.status} />
-          <InfoRow label="Tgl Submit" value={team.ppt.submittedAt ? new Date(team.ppt.submittedAt).toLocaleString("id") : "-"} />
+          <InfoRow
+            label="Tgl Submit"
+            value={
+              team.ppt.submittedAt
+                ? new Date(team.ppt.submittedAt).toLocaleString("id")
+                : "-"
+            }
+          />
           {team.ppt.file?.webViewLink && (
-            <FileLink label="File PPT" url={team.ppt.file.webViewLink} fileName={team.ppt.file.fileName} />
+            <FileLink
+              label="File PPT"
+              url={team.ppt.file.webViewLink}
+              fileName={team.ppt.file.fileName}
+            />
           )}
         </div>
       )}
@@ -241,20 +346,41 @@ export default function AdminTeamDetailPage() {
       </div>
 
       <div className="flex gap-4 pt-4">
-        <button
-          onClick={() => handleVerify("verified")}
-          className="flex items-center gap-2 px-6 py-3 bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 text-green-300 font-bold rounded-[1rem] transition-all"
-        >
-          <CheckCircle size={20} />
-          Verifikasi
-        </button>
-        <button
-          onClick={() => handleVerify("rejected")}
-          className="flex items-center gap-2 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 font-bold rounded-[1rem] transition-all"
-        >
-          <XCircle size={20} />
-          Tolak
-        </button>
+        {team.status === "pending" ? (
+          <>
+            <button
+              onClick={() => handleVerify("verified")}
+              className="flex items-center gap-2 px-6 py-3 bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 text-green-300 font-bold rounded-[1rem] transition-all"
+            >
+              <CheckCircle size={20} />
+              Verifikasi
+            </button>
+
+            <button
+              onClick={() => handleVerify("rejected")}
+              className="flex items-center gap-2 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 font-bold rounded-[1rem] transition-all"
+            >
+              <XCircle size={20} />
+              Tolak
+            </button>
+          </>
+        ) : team.status === "verified" ? (
+          <button
+            onClick={() => handleVerify("rejected")}
+            className="flex items-center gap-2 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 font-bold rounded-[1rem] transition-all"
+          >
+            <XCircle size={20} />
+            Tolak
+          </button>
+        ) : (
+          <button
+            onClick={() => handleVerify("verified")}
+            className="flex items-center gap-2 px-6 py-3 bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 text-green-300 font-bold rounded-[1rem] transition-all"
+          >
+            <CheckCircle size={20} />
+            Verifikasi
+          </button>
+        )}
       </div>
     </div>
   );
@@ -269,7 +395,15 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function FileLink({ label, url, fileName }: { label: string; url: string; fileName?: string }) {
+function FileLink({
+  label,
+  url,
+  fileName,
+}: {
+  label: string;
+  url: string;
+  fileName?: string;
+}) {
   return (
     <div>
       <p className="text-sm text-white/60 font-medium">{label}</p>
