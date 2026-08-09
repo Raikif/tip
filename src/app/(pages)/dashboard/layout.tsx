@@ -16,6 +16,8 @@ import {
   ClipboardList,
   UserCog,
   Calendar,
+  Menu,
+  X,
 } from "lucide-react";
 import { logoutUser } from "@/app/lib/action/auth";
 import { useEventTimeline } from "@/app/(utils)/hooks/useEventTimeline";
@@ -41,6 +43,7 @@ export default function DashboardLayout({
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [bypass, setBypass] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const { timeline } = useEventTimeline();
@@ -98,6 +101,15 @@ export default function DashboardLayout({
     load();
   }, [router]);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
+
   const handleLogout = async () => {
     await logoutUser();
     localStorage.removeItem("debug_time_bypass");
@@ -130,6 +142,157 @@ export default function DashboardLayout({
   const isAdmin = user.user_role === "admin";
   const isJuri = user.user_role === "juri";
 
+  const renderNav = (onNavigate?: () => void) => (
+    <>
+      {/* Guest nav */}
+      {isGuest && (
+        <>
+          <NavLink
+            href="/dashboard"
+            pathname={pathname}
+            icon={<Home size={22} />}
+            label="Beranda"
+            onNavigate={onNavigate}
+          />
+          <NavLink
+            href="/dashboard/team"
+            pathname={pathname}
+            icon={<Users size={22} />}
+            label="My Team"
+            onNavigate={onNavigate}
+          />
+          <div className="pt-8 pb-3 relative">
+            <div className="absolute inset-0 top-1/2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <p className="relative z-10 bg-transparent inline-block px-3 text-[10px] font-black text-white/50 uppercase tracking-widest mx-2 backdrop-blur-sm rounded-full">
+              Pengumpulan Karya
+            </p>
+          </div>
+          {(user.category === "lkti" || user.category === "essay") && user.team_status !== "rejected" && (
+            <>
+              <NavLink
+                href="/dashboard/abstrak"
+                pathname={pathname}
+                icon={<FileText size={22} />}
+                label="Abstrak"
+                subtitle={(isFullpaper || isFinal) ? "Lolos / Disubmit" : undefined}
+                onNavigate={onNavigate}
+              />
+              {(isFullpaper || isFinal) && (
+                <NavLink
+                  href="/dashboard/fullpaper"
+                  pathname={pathname}
+                  icon={<FilePlus size={22} />}
+                  label="Fullpaper"
+                  subtitle={isFinal ? "Lolos / Disubmit" : undefined}
+                  disabled={isFinal}
+                  onNavigate={onNavigate}
+                />
+              )}
+              {isFinal && (
+                <NavLink
+                  href="/dashboard/ppt"
+                  pathname={pathname}
+                  icon={<FilePlus size={22} />}
+                  label="PPT"
+                  onNavigate={onNavigate}
+                />
+              )}
+            </>
+          )}
+          {user.category === "poster" && user.team_status !== "rejected" && (
+            <NavLink
+              href="/dashboard/poster"
+              pathname={pathname}
+              icon={<ImageIcon size={22} />}
+              label="Poster"
+              onNavigate={onNavigate}
+            />
+          )}
+        </>
+      )}
+
+      {/* Admin nav */}
+      {isAdmin && (
+        <>
+          <NavLink
+            href="/dashboard"
+            pathname={pathname}
+            icon={<Shield size={22} />}
+            label="Overview"
+            onNavigate={onNavigate}
+          />
+          <div className="pt-8 pb-3 relative">
+            <div className="absolute inset-0 top-1/2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <p className="relative z-10 bg-transparent inline-block px-3 text-[10px] font-black text-white/50 uppercase tracking-widest mx-2 backdrop-blur-sm rounded-full">
+              Management
+            </p>
+          </div>
+          <NavLink
+            href="/dashboard/teams"
+            pathname={pathname}
+            icon={<Users size={22} />}
+            label="Teams"
+            onNavigate={onNavigate}
+          />
+          <NavLink
+            href="/dashboard/verifikasi"
+            pathname={pathname}
+            icon={<CheckSquare size={22} />}
+            label="Verifikasi"
+            onNavigate={onNavigate}
+          />
+          <NavLink
+            href="/dashboard/users"
+            pathname={pathname}
+            icon={<UserCog size={22} />}
+            label="Users"
+            onNavigate={onNavigate}
+          />
+          <NavLink
+            href="/dashboard/timeline"
+            pathname={pathname}
+            icon={<Calendar size={22} />}
+            label="Timeline"
+            onNavigate={onNavigate}
+          />
+        </>
+      )}
+
+      {/* Juri nav */}
+      {isJuri && (
+        <>
+          <NavLink
+            href="/dashboard"
+            pathname={pathname}
+            icon={<ClipboardList size={22} />}
+            label="Overview"
+            onNavigate={onNavigate}
+          />
+          <div className="pt-8 pb-3 relative">
+            <div className="absolute inset-0 top-1/2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <p className="relative z-10 bg-transparent inline-block px-3 text-[10px] font-black text-white/50 uppercase tracking-widest mx-2 backdrop-blur-sm rounded-full">
+              Penilaian
+            </p>
+          </div>
+          <NavLink
+            href="/dashboard/submissions"
+            pathname={pathname}
+            icon={<FileText size={22} />}
+            label="Submissions"
+            onNavigate={onNavigate}
+          />
+          <NavLink
+            href="/dashboard/score"
+            pathname={pathname}
+            icon={<Star size={22} />}
+            label="Beri Nilai"
+            onNavigate={onNavigate}
+          />
+        </>
+      )}
+    </>
+  );
+
   return (
     <div className="min-h-screen w-full flex bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900">
       {/* Sidebar */}
@@ -148,139 +311,7 @@ export default function DashboardLayout({
         </div>
 
         <nav className="flex-1 p-5 space-y-2.5 overflow-y-auto">
-          {/* Guest nav */}
-          {isGuest && (
-            <>
-              <NavLink
-                href="/dashboard"
-                pathname={pathname}
-                icon={<Home size={22} />}
-                label="Beranda"
-              />
-              <NavLink
-                href="/dashboard/team"
-                pathname={pathname}
-                icon={<Users size={22} />}
-                label="My Team"
-              />
-              <div className="pt-8 pb-3 relative">
-                <div className="absolute inset-0 top-1/2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                <p className="relative z-10 bg-transparent inline-block px-3 text-[10px] font-black text-white/50 uppercase tracking-widest mx-2 backdrop-blur-sm rounded-full">
-                  Pengumpulan Karya
-                </p>
-              </div>
-              {(user.category === "lkti" || user.category === "essay") && user.team_status !== "rejected" && (
-                <>
-                  <NavLink
-                    href="/dashboard/abstrak"
-                    pathname={pathname}
-                    icon={<FileText size={22} />}
-                    label="Abstrak"
-                    subtitle={(isFullpaper || isFinal) ? "Lolos / Disubmit" : undefined}
-                  />
-                  {(isFullpaper || isFinal) && (
-                    <NavLink
-                      href="/dashboard/fullpaper"
-                      pathname={pathname}
-                      icon={<FilePlus size={22} />}
-                      label="Fullpaper"
-                      subtitle={isFinal ? "Lolos / Disubmit" : undefined}
-                      disabled={isFinal}
-                    />
-                  )}
-                  {isFinal && (
-                    <NavLink
-                      href="/dashboard/ppt"
-                      pathname={pathname}
-                      icon={<FilePlus size={22} />}
-                      label="PPT"
-                    />
-                  )}
-                </>
-              )}
-              {user.category === "poster" && user.team_status !== "rejected" && (
-                <NavLink
-                  href="/dashboard/poster"
-                  pathname={pathname}
-                  icon={<ImageIcon size={22} />}
-                  label="Poster"
-                />
-              )}
-
-            </>
-          )}
-
-          {/* Admin nav */}
-          {isAdmin && (
-            <>
-              <NavLink
-                href="/dashboard"
-                pathname={pathname}
-                icon={<Shield size={22} />}
-                label="Overview"
-              />
-              <div className="pt-8 pb-3 relative">
-                <div className="absolute inset-0 top-1/2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                <p className="relative z-10 bg-transparent inline-block px-3 text-[10px] font-black text-white/50 uppercase tracking-widest mx-2 backdrop-blur-sm rounded-full">
-                  Management
-                </p>
-              </div>
-              <NavLink
-                href="/dashboard/teams"
-                pathname={pathname}
-                icon={<Users size={22} />}
-                label="Teams"
-              />
-              <NavLink
-                href="/dashboard/verifikasi"
-                pathname={pathname}
-                icon={<CheckSquare size={22} />}
-                label="Verifikasi"
-              />
-              <NavLink
-                href="/dashboard/users"
-                pathname={pathname}
-                icon={<UserCog size={22} />}
-                label="Users"
-              />
-              <NavLink
-                href="/dashboard/timeline"
-                pathname={pathname}
-                icon={<Calendar size={22} />}
-                label="Timeline"
-              />
-            </>
-          )}
-
-          {/* Juri nav */}
-          {isJuri && (
-            <>
-              <NavLink
-                href="/dashboard"
-                pathname={pathname}
-                icon={<ClipboardList size={22} />}
-                label="Overview"
-              />
-              <div className="pt-8 pb-3 relative">
-                <div className="absolute inset-0 top-1/2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                <p className="relative z-10 bg-transparent inline-block px-3 text-[10px] font-black text-white/50 uppercase tracking-widest mx-2 backdrop-blur-sm rounded-full">
-                  Penilaian
-                </p>
-              </div>
-              <NavLink
-                href="/dashboard/submissions"
-                pathname={pathname}
-                icon={<FileText size={22} />}
-                label="Submissions"
-              />
-              <NavLink
-                href="/dashboard/score"
-                pathname={pathname}
-                icon={<Star size={22} />}
-                label="Beri Nilai"
-              />
-            </>
-          )}
+          {renderNav()}
         </nav>
 
         <div className="p-5 border-t border-white/10 bg-black/10">
@@ -299,6 +330,13 @@ export default function DashboardLayout({
         {/* Mobile Header */}
         <header className="md:hidden bg-white/10 backdrop-blur-xl border-b border-white/20 p-4 flex justify-between items-center sticky top-0 z-30 shadow-md">
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMenuOpen(true)}
+              aria-label="Buka menu navigasi"
+              className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center text-white shadow-inner border border-white/30 transition-all"
+            >
+              <Menu size={22} />
+            </button>
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-inner border border-white/30">
               {user.user_name?.[0]?.toUpperCase() || "T"}
             </div>
@@ -313,6 +351,48 @@ export default function DashboardLayout({
             Keluar
           </button>
         </header>
+
+        {/* Mobile Drawer */}
+        {menuOpen && (
+          <div className="fixed inset-0 z-40 md:hidden">
+            <div
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setMenuOpen(false)}
+            />
+            <div className="absolute inset-y-0 left-0 w-72 max-w-[85%] bg-white/10 backdrop-blur-2xl border-r border-white/20 shadow-2xl flex flex-col overflow-hidden animate-entrance">
+              <div className="p-5 pb-4 text-center relative border-b border-white/10">
+                <button
+                  onClick={() => setMenuOpen(false)}
+                  aria-label="Tutup menu navigasi"
+                  className="absolute right-3 top-3 w-9 h-9 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center text-white transition-all"
+                >
+                  <X size={18} />
+                </button>
+                <div className="w-14 h-14 bg-gradient-to-br from-yellow-300 to-amber-500 rounded-[1rem] flex items-center justify-center mx-auto mb-3 text-white text-xl font-black shadow-[0_10px_20px_rgba(252,211,77,0.3)] border border-yellow-200/50">
+                  {user.user_name?.[0]?.toUpperCase() || "T"}
+                </div>
+                <h2 className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-400 drop-shadow-md pb-1">
+                  {user.user_name || "User"}
+                </h2>
+                <span className="inline-block bg-white/20 text-white text-xs font-bold px-3 py-1 mt-1 rounded-full border border-white/30 backdrop-blur-sm tracking-wider uppercase">
+                  {isGuest ? "Peserta" : user.user_role}
+                </span>
+              </div>
+              <nav className="flex-1 p-5 space-y-2.5 overflow-y-auto">
+                {renderNav(() => setMenuOpen(false))}
+              </nav>
+              <div className="p-5 border-t border-white/10 bg-black/10">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-3 px-5 py-4 bg-white/10 text-white/90 hover:bg-red-500/80 hover:text-white hover:-translate-y-1 rounded-[1.2rem] font-bold transition-all duration-300 shadow-sm backdrop-blur-md"
+                >
+                  <LogOut size={22} />
+                  Keluar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="p-6 md:p-10 flex-1 w-full max-w-6xl mx-auto">
           {children}
@@ -329,6 +409,7 @@ function NavLink({
   label,
   subtitle,
   disabled,
+  onNavigate,
 }: {
   href: string;
   pathname: string;
@@ -336,6 +417,7 @@ function NavLink({
   label: string;
   subtitle?: string;
   disabled?: boolean;
+  onNavigate?: () => void;
 }) {
   const active = isActive(pathname, href) && !disabled;
   return (
@@ -343,6 +425,7 @@ function NavLink({
       href={disabled ? "#" : href}
       onClick={(e) => {
         if (disabled) e.preventDefault();
+        else onNavigate?.();
       }}
       className={`flex items-center gap-4 px-5 py-3 transition-all duration-300 rounded-[1.2rem] font-bold ${
         disabled

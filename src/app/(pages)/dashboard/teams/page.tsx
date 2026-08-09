@@ -10,12 +10,17 @@ export default function AdminTeamsPage() {
   const [filter, setFilter] = useState("all");
   const [actionMsg, setActionMsg] = useState("");
   const [actionErr, setActionErr] = useState("");
+  const [loadErr, setLoadErr] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
-      const { getAllTeams } = await import("@/app/lib/action/users");
-      const data = await getAllTeams();
-      setTeams(data);
+      try {
+        const { getAllTeams } = await import("@/app/lib/action/users");
+        const data = await getAllTeams();
+        setTeams(data);
+      } catch {
+        setLoadErr("Gagal memuat data tim. Periksa koneksi Anda.");
+      }
     }
     load();
   }, []);
@@ -68,6 +73,12 @@ export default function AdminTeamsPage() {
       {actionErr && (
         <div className="bg-red-500/20 text-red-100 border border-red-400/30 p-4 rounded-xl text-sm font-medium">
           {actionErr}
+        </div>
+      )}
+      {loadErr && (
+        <div className="bg-red-500/10 border border-red-400/30 text-red-200 p-6 rounded-[1.5rem] text-center">
+          <p className="font-bold text-lg mb-2">Gagal memuat data</p>
+          <p className="text-white/70 text-sm font-medium">{loadErr}</p>
         </div>
       )}
 

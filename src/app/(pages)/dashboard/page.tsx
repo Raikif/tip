@@ -45,10 +45,14 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function load() {
-      const { getCurrentUser } = await import("@/app/lib/action/auth");
-      const session = await getCurrentUser();
-      if (!session) return;
-      setUser(session);
+      try {
+        const { getCurrentUser } = await import("@/app/lib/action/auth");
+        const session = await getCurrentUser();
+        if (!session) return;
+        setUser(session);
+      } catch {
+        return;
+      }
     }
     load();
   }, []);
@@ -74,32 +78,46 @@ function AdminHome() {
     essay: 0,
     poster: 0,
   });
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
-      const { getAllTeams } = await import("@/app/lib/action/users");
-      const teams = await getAllTeams();
-      const s = {
-        total: teams.length,
-        verified: 0,
-        pending: 0,
-        rejected: 0,
-        lkti: 0,
-        essay: 0,
-        poster: 0,
-      };
-      for (const t of teams) {
-        if (t.status === "verified") s.verified++;
-        else if (t.status === "rejected") s.rejected++;
-        else s.pending++;
-        if (t.category === "lkti") s.lkti++;
-        else if (t.category === "essay") s.essay++;
-        else if (t.category === "poster") s.poster++;
+      try {
+        const { getAllTeams } = await import("@/app/lib/action/users");
+        const teams = await getAllTeams();
+        const s = {
+          total: teams.length,
+          verified: 0,
+          pending: 0,
+          rejected: 0,
+          lkti: 0,
+          essay: 0,
+          poster: 0,
+        };
+        for (const t of teams) {
+          if (t.status === "verified") s.verified++;
+          else if (t.status === "rejected") s.rejected++;
+          else s.pending++;
+          if (t.category === "lkti") s.lkti++;
+          else if (t.category === "essay") s.essay++;
+          else if (t.category === "poster") s.poster++;
+        }
+        setStats(s);
+      } catch {
+        setError("Gagal memuat data tim. Periksa koneksi Anda.");
       }
-      setStats(s);
     }
     load();
   }, []);
+
+  if (error) {
+    return (
+      <div className="bg-red-500/10 border border-red-400/30 text-red-200 p-6 rounded-[1.5rem] text-center">
+        <p className="font-bold text-lg mb-2">Gagal memuat data</p>
+        <p className="text-white/70 text-sm font-medium">{error}</p>
+      </div>
+    );
+  }
 
   const cards = [
     { label: "Total Tim", value: stats.total, icon: Users, color: "text-blue-300 bg-blue-500/20 border-blue-400/30" },
@@ -166,23 +184,37 @@ function AdminHome() {
 
 function JuriHome() {
   const [stats, setStats] = useState({ total: 0, scored: 0 });
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
-      const { getCurrentUser } = await import("@/app/lib/action/auth");
-      const session = await getCurrentUser();
-      if (!session) return;
-      const { getTeamsWithSubmissions } = await import(
-        "@/app/lib/action/penilaian"
-      );
-      const teams = await getTeamsWithSubmissions();
-      const scored = teams.filter(
-        (t: any) => t.penilaian?.[session.user_id],
-      );
-      setStats({ total: teams.length, scored: scored.length });
+      try {
+        const { getCurrentUser } = await import("@/app/lib/action/auth");
+        const session = await getCurrentUser();
+        if (!session) return;
+        const { getTeamsWithSubmissions } = await import(
+          "@/app/lib/action/penilaian"
+        );
+        const teams = await getTeamsWithSubmissions();
+        const scored = teams.filter(
+          (t: any) => t.penilaian?.[session.user_id],
+        );
+        setStats({ total: teams.length, scored: scored.length });
+      } catch {
+        setError("Gagal memuat data penilaian. Periksa koneksi Anda.");
+      }
     }
     load();
   }, []);
+
+  if (error) {
+    return (
+      <div className="bg-red-500/10 border border-red-400/30 text-red-200 p-6 rounded-[1.5rem] text-center">
+        <p className="font-bold text-lg mb-2">Gagal memuat data</p>
+        <p className="text-white/70 text-sm font-medium">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

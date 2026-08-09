@@ -7,13 +7,19 @@ import { CheckCircle, Info } from "lucide-react";
 export default function AdminVerifikasiPage() {
   const [pending, setPending] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadErr, setLoadErr] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
-      const { getAllTeams } = await import("@/app/lib/action/users");
-      const all = await getAllTeams();
-      setPending(all.filter((t: any) => t.status === "pending"));
-      setLoading(false);
+      try {
+        const { getAllTeams } = await import("@/app/lib/action/users");
+        const all = await getAllTeams();
+        setPending(all.filter((t: any) => t.status === "pending"));
+      } catch {
+        setLoadErr("Gagal memuat data tim. Periksa koneksi Anda.");
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, []);
@@ -26,6 +32,11 @@ export default function AdminVerifikasiPage() {
       <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[1.5rem] overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-white/60">Loading...</div>
+        ) : loadErr ? (
+          <div className="p-8 text-center">
+            <p className="font-bold text-lg text-red-200 mb-2">Gagal memuat data</p>
+            <p className="text-white/70 text-sm font-medium">{loadErr}</p>
+          </div>
         ) : pending.length === 0 ? (
           <div className="p-12 text-center text-white/50">
             <CheckCircle size={48} className="mx-auto mb-4 text-green-300/50" />
