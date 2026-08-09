@@ -103,7 +103,14 @@ export async function updateTeamStatus(
   return { ok: true };
 }
 
-export async function getAllTeams() {
+export type TeamData = {
+  teamName: string;
+  status?: string;
+  category?: string;
+  [key: string]: any;
+};
+
+export async function getAllTeams(): Promise<TeamData[]> {
   await requireAdmin();
 
   const db = getFirebaseAdminDb();
@@ -117,7 +124,9 @@ export async function getAllTeams() {
   }));
 }
 
-export async function getTeamByTeamName(teamName: string) {
+export async function getTeamByTeamName(
+  teamName: string,
+): Promise<TeamData | null> {
   await requireAdmin();
 
   const db = getFirebaseAdminDb();
