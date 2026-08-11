@@ -17,6 +17,7 @@ export default function AdminTeamDetailPage() {
   const rawTeamName = params.teamName as string;
   const teamName = rawTeamName ? decodeURIComponent(rawTeamName) : "";
   const [team, setTeam] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [actionMsg, setActionMsg] = useState("");
   const [err, setErr] = useState("");
 
@@ -25,10 +26,14 @@ export default function AdminTeamDetailPage() {
       if (!teamName) return;
       try {
         const { getTeamByTeamName } = await import("@/app/lib/action/users");
+        console.log("[TeamDetail] loading teamName:", teamName);
         const found = await getTeamByTeamName(teamName);
+        console.log("[TeamDetail] result:", found);
         setTeam(found || null);
       } catch {
         setErr("Gagal memuat data tim.");
+      } finally {
+        setLoading(false);
       }
     }
     load();
@@ -87,8 +92,38 @@ export default function AdminTeamDetailPage() {
     }
   }
 
-  if (!team) {
+  if (loading) {
     return <div className="p-8 text-white/80">Memuat data tim...</div>;
+  }
+
+  if (err) {
+    return (
+      <div className="p-8 space-y-4">
+        <p className="text-red-300 font-medium">{err}</p>
+        <Link
+          href="/dashboard/teams"
+          className="text-white/70 hover:text-white text-sm font-medium transition-colors"
+        >
+          Kembali ke daftar tim
+        </Link>
+      </div>
+    );
+  }
+
+  if (!team) {
+    return (
+      <div className="p-8 space-y-4">
+        <p className="text-white/80 font-medium">
+          Tim dengan ID/URL "{teamName}" tidak ditemukan.
+        </p>
+        <Link
+          href="/dashboard/teams"
+          className="text-white/70 hover:text-white text-sm font-medium transition-colors"
+        >
+          Kembali ke daftar tim
+        </Link>
+      </div>
+    );
   }
 
   return (

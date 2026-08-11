@@ -172,6 +172,22 @@ export async function getTeamByTeamName(
   await requireAdmin();
 
   const db = getFirebaseAdminDb();
+  console.log("[getTeamByTeamName] input:", teamName);
+
+  const directSnapshot = await db.ref(`peserta/${teamName}`).once("value");
+  if (directSnapshot.exists()) {
+    const data = directSnapshot.val() as Record<string, any>;
+    console.log("[getTeamByTeamName] direct hit by key:", teamName);
+    return {
+      ...data,
+      id: directSnapshot.key ?? teamName,
+      teamName:
+        typeof data.teamName === "string" && data.teamName.trim()
+          ? data.teamName
+          : directSnapshot.key ?? teamName,
+    };
+  }
+
   const snapshot = await db.ref("peserta").once("value");
   const data = snapshot.val() as Record<string, any> | null;
   if (!data) {
@@ -191,6 +207,7 @@ export async function getTeamByTeamName(
   const [id] = entry;
   const team = entry[1] as Record<string, any>;
 
+  console.log("[getTeamByTeamName] fallback hit:", id);
   return {
     ...team,
     id,
