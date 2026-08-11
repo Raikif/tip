@@ -91,11 +91,18 @@ export default function EditTeamPage() {
     setMsg("");
 
     try {
+      const { getTeamByTeamName } = await import("@/app/lib/action/users");
+      const current = await getTeamByTeamName(teamName);
+      if (!current?.id) {
+        setErr("Tim tidak ditemukan.");
+        setSaving(false);
+        return;
+      }
       const { updateTeam } = await import("@/app/lib/action/users");
-      const res = await updateTeam(teamName, form);
+      const res = await updateTeam(current.id, form);
       if (res.ok) {
         setMsg("Data tim berhasil diperbarui.");
-        setTimeout(() => router.push(`/dashboard/teams/${teamName}`), 800);
+        setTimeout(() => router.push(`/dashboard/teams/${current.id}`), 800);
       } else {
         setErr(res.error || "Gagal memperbarui data.");
       }
@@ -118,7 +125,7 @@ export default function EditTeamPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <Link
-        href={`/dashboard/teams/${teamName}`}
+        href={`/dashboard/teams/${encodeURIComponent(teamName)}`}
         className="text-white/70 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors"
       >
         <ArrowLeft size={18} />

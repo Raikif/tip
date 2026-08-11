@@ -139,21 +139,21 @@ export default function AdminTeamsPage() {
                   </td>
                   <td className="p-4 text-right flex gap-2 justify-end">
                     <Link
-                      href={`/dashboard/teams/${encodeURIComponent(team.teamName)}/edit`}
+                      href={`/dashboard/teams/${encodeURIComponent(team.id)}/edit`}
                       className="p-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 transition-all"
                       title="Edit"
                     >
                       <Pencil size={16} />
                     </Link>
                     <button
-                      onClick={() => handleDelete(team.teamName)}
+                      onClick={() => handleDelete(team.id)}
                       className="p-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 transition-all"
                       title="Hapus"
                     >
                       <Trash2 size={16} />
                     </button>
                     <Link
-                      href={`/dashboard/teams/${encodeURIComponent(team.teamName)}`}
+                      href={`/dashboard/teams/${encodeURIComponent(team.id)}`}
                       className="p-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white/70 transition-all"
                       title="Detail"
                     >

@@ -65,11 +65,11 @@ export default function JuriSubmissionsPage() {
               {filtered.map((team) => {
                 const sudahDinilai = !!team.penilaian?.[team.juriId];
                 return (
-                  <tr key={team.teamName} className="border-b border-white/10 hover:bg-white/5 transition-colors">
+                  <tr key={team.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
                     <td className="p-4 font-bold">{team.teamName}</td>
                     <td className="p-4 text-white/80 uppercase text-sm">{team.category}</td>
                     <td className="p-4 text-white/70 text-sm hidden md:table-cell truncate max-w-[200px]">
-                      {team.abstrak?.title || "-"}
+                      {team.abstrak?.title || team.poster?.title || team.fullpaper?.title || team.ppt?.link || "-"}
                     </td>
                     <td className="p-4">
                       <span
@@ -84,7 +84,7 @@ export default function JuriSubmissionsPage() {
                     </td>
                     <td className="p-4 text-right">
                       <Link
-                        href={`/dashboard/score?team=${team.teamName}`}
+                        href={`/dashboard/score?team=${team.id}`}
                         className="inline-flex items-center gap-1 px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white/80 text-sm font-bold transition-all"
                       >
                         {sudahDinilai ? <Eye size={16} /> : <Star size={16} />}

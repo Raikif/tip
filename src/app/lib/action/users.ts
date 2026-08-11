@@ -91,19 +91,36 @@ export async function deleteUser(id: string) {
 }
 
 export async function updateTeamStatus(
-  teamName: string,
+  teamId: string,
   status: "pending" | "verified" | "rejected",
 ) {
-  const session = await requireAdmin();
+  try {
+    const session = await requireAdmin();
 
-  const db = getFirebaseAdminDb();
-  await db.ref(`peserta/${teamName}/status`).set(status);
-  await db.ref(`peserta/${teamName}/verifiedBy`).set(session.user_name);
-  await db.ref(`peserta/${teamName}/verifiedAt`).set(new Date().toISOString());
-  return { ok: true };
+    const db = getFirebaseAdminDb();
+    const teamRef = db.ref(`peserta/${teamId}`);
+    const snapshot = await teamRef.once("value");
+    if (!snapshot.exists()) {
+      return { ok: false, error: "Tim tidak ditemukan." };
+    }
+
+    await teamRef.update({
+      status,
+      verifiedBy: session.user_name ?? null,
+      verifiedAt: new Date().toISOString(),
+    });
+    return { ok: true };
+  } catch (error) {
+    console.error("[updateTeamStatus]", error);
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Gagal memperbarui status tim.",
+    };
+  }
 }
 
 export type TeamData = {
+  id: string;
   teamName: string;
   status?: string;
   category?: string;
@@ -114,14 +131,39 @@ export async function getAllTeams(): Promise<TeamData[]> {
   await requireAdmin();
 
   const db = getFirebaseAdminDb();
-  if (!db) return [];
   const snapshot = await db.ref("peserta").once("value");
   const data = snapshot.val() as Record<string, any> | null;
-  if (!data) return [];
-  return Object.entries(data).map(([teamName, team]) => ({
-    teamName,
-    ...(team as Record<string, any>),
-  }));
+  const rootKeys = Object.keys(data || {});
+
+  if (!data) {
+    console.log("[getAllTeams] peserta not found");
+    return [];
+  }
+
+  const result: TeamData[] = Object.entries(data).map(([id, rawTeam]) => {
+    const team = rawTeam as Record<string, any>;
+    return {
+      ...team,
+      id,
+      teamName:
+        typeof team.teamName === "string" && team.teamName.trim()
+          ? team.teamName
+          : id,
+    };
+  });
+
+  console.log(
+    "[getAllTeams] peserta exists:",
+    !!data,
+    "root keys count:",
+    rootKeys.length,
+    "sample keys:",
+    rootKeys.slice(0, 5),
+    "mapped:",
+    result.slice(0, 2),
+  );
+
+  return result;
 }
 
 export async function getTeamByTeamName(
@@ -130,10 +172,33 @@ export async function getTeamByTeamName(
   await requireAdmin();
 
   const db = getFirebaseAdminDb();
-  const snapshot = await db.ref(`peserta/${teamName}`).once("value");
+  const snapshot = await db.ref("peserta").once("value");
   const data = snapshot.val() as Record<string, any> | null;
-  if (!data) return null;
-  return { teamName, ...data };
+  if (!data) {
+    console.log("[getTeamByTeamName] peserta not found");
+    return null;
+  }
+
+  const entry = Object.entries(data).find(
+    ([, v]) => (v?.teamName || "").trim().toLowerCase() === teamName.trim().toLowerCase(),
+  );
+
+  if (!entry) {
+    console.log("[getTeamByTeamName] no match for:", teamName, "available keys:", Object.keys(data).slice(0, 10));
+    return null;
+  }
+
+  const [id] = entry;
+  const team = entry[1] as Record<string, any>;
+
+  return {
+    ...team,
+    id,
+    teamName:
+      typeof team.teamName === "string" && team.teamName.trim()
+        ? team.teamName
+        : id,
+  };
 }
 
 const TEAM_EDITABLE_FIELDS = [
@@ -154,11 +219,14 @@ const TEAM_EDITABLE_FIELDS = [
   "status",
 ] as const;
 
-export async function updateTeam(teamName: string, data: Record<string, any>) {
+export async function updateTeam(
+  teamId: string,
+  data: Record<string, any>,
+) {
   await requireAdmin();
 
   const db = getFirebaseAdminDb();
-  const snapshot = await db.ref(`peserta/${teamName}`).once("value");
+  const snapshot = await db.ref(`peserta/${teamId}`).once("value");
   if (!snapshot.exists()) return { ok: false, error: "Tim tidak ditemukan" };
 
   const updates: Record<string, any> = {};
@@ -170,17 +238,17 @@ export async function updateTeam(teamName: string, data: Record<string, any>) {
 
   if (Object.keys(updates).length === 0) return { ok: true };
 
-  await db.ref(`peserta/${teamName}`).update(updates);
+  await db.ref(`peserta/${teamId}`).update(updates);
   return { ok: true };
 }
 
-export async function deleteTeam(teamName: string) {
+export async function deleteTeam(teamId: string) {
   await requireAdmin();
 
   const db = getFirebaseAdminDb();
-  const snapshot = await db.ref(`peserta/${teamName}`).once("value");
+  const snapshot = await db.ref(`peserta/${teamId}`).once("value");
   if (!snapshot.exists()) return { ok: false, error: "Tim tidak ditemukan" };
 
-  await db.ref(`peserta/${teamName}`).remove();
+  await db.ref(`peserta/${teamId}`).remove();
   return { ok: true };
 }

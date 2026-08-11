@@ -76,7 +76,7 @@ export default function JuriScorePage() {
     e.preventDefault();
     if (!team) return;
     const { submitScore } = await import("@/app/lib/action/penilaian");
-    const res = await submitScore({ teamName: team.teamName, skor, catatan });
+    const res = await submitScore({ teamName: team.id, skor, catatan });
     if (res.ok) {
       setMsg("Nilai berhasil disimpan!");
       setExistingScore({ skor, catatan });
@@ -112,7 +112,7 @@ export default function JuriScorePage() {
           className="w-full h-12 px-4 rounded-[1rem] bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-4 focus:ring-white/20 cursor-pointer"
         >
           {allTeams.map((t: any) => (
-            <option key={t.teamName} value={t.teamName} className="text-slate-900">
+            <option key={t.id} value={t.id} className="text-slate-900">
               {t.teamName} ({t.category})
             </option>
           ))}
@@ -136,10 +136,10 @@ export default function JuriScorePage() {
               </div>
             </div>
             <div className="border-t border-white/10 pt-4 mt-4">
-              <p className="text-white/60 font-medium mb-1">Judul Abstrak</p>
-              <p className="font-bold text-white">{team.abstrak?.title || "-"}</p>
+              <p className="text-white/60 font-medium mb-1">Judul</p>
+              <p className="font-bold text-white">{team.abstrak?.title || team.poster?.title || team.fullpaper?.title || team.ppt?.link || "-"}</p>
               <p className="text-white/60 font-medium mt-3 mb-1">Subtema</p>
-              <p className="font-bold text-white">{team.abstrak?.subtema || "-"}</p>
+              <p className="font-bold text-white">{team.abstrak?.subtema || team.poster?.subtema || team.fullpaper?.subtema || "-"}</p>
             </div>
           </div>
 

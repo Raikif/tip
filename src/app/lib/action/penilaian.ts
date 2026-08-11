@@ -14,16 +14,25 @@ export async function getTeamsWithSubmissions() {
   const data = snapshot.val() as Record<string, any> | null;
   if (!data) return [];
 
-  return Object.entries(data)
-    .filter(([, team]) => team.abstrak)
-    .map(([teamName, team]) => ({
-      teamName,
+  const raw = Object.entries(data)
+    .filter(([, team]) => team.abstrak || team.poster || team.fullpaper || team.ppt)
+    .map(([id, team]) => ({
+      id,
+      teamName:
+        typeof team.teamName === "string" && team.teamName.trim()
+          ? team.teamName
+          : id,
       category: team.category,
       institution: team.institution,
       leaderName: team.leaderName,
       abstrak: team.abstrak,
+      poster: team.poster,
+      fullpaper: team.fullpaper,
+      ppt: team.ppt,
       penilaian: team.penilaian || {},
     }));
+
+  return raw;
 }
 
 export async function submitScore(data: {

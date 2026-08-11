@@ -115,6 +115,24 @@ export async function registerUser(data: {
   anggota2TwibbonFile?: UploadedFile | null;
 }) {
   try {
+    const requiredFields: (keyof typeof data)[] = [
+      "teamName",
+      "category",
+      "institution",
+      "leaderName",
+      "leaderNim",
+      "leaderWa",
+      "leaderEmail",
+      "leaderPassword",
+    ];
+    const missing = requiredFields.filter((f) => !data[f] || String(data[f]).trim() === "");
+    if (missing.length > 0) {
+      return {
+        ok: false,
+        error: `Field wajib tidak boleh kosong: ${missing.join(", ")}`,
+      };
+    }
+
     const db = getFirebaseAdminDb();
     const headersList = await headers();
     const clientIp =
@@ -139,29 +157,45 @@ export async function registerUser(data: {
         };
       }
 
-      const duplicateTeam = Object.entries(peserta).find(
-        ([, value]) =>
-          (value?.teamName || "").trim().toLowerCase() ===
-          data.teamName.trim().toLowerCase(),
-      );
-      if (duplicateTeam) {
-        return {
-          ok: false,
-          error: `Nama tim "${data.teamName}" sudah terdaftar. Gunakan nama tim yang berbeda.`,
-        };
-      }
+      const normalizedTeamName = data.teamName.trim();
+    const normalizedCategory = data.category.trim();
+    const normalizedInstitution = data.institution.trim();
+    const normalizedLeaderName = data.leaderName.trim();
+    const normalizedLeaderNim = data.leaderNim.trim();
+    const normalizedLeaderWa = data.leaderWa.trim();
+    const normalizedLeaderEmail = data.leaderEmail.trim();
+
+    if (/[.$#[\]/]/.test(normalizedTeamName)) {
+      return {
+        ok: false,
+        error:
+          'Nama tim tidak boleh mengandung karakter khusus: . $ # [ ] /',
+      };
     }
+
+    const duplicateTeam = Object.entries(peserta).find(
+      ([, value]) =>
+        (value?.teamName || "").trim().toLowerCase() ===
+        normalizedTeamName.toLowerCase(),
+    );
+    if (duplicateTeam) {
+      return {
+        ok: false,
+        error: `Nama tim "${normalizedTeamName}" sudah terdaftar. Gunakan nama tim yang berbeda.`,
+      };
+    }
+  }
 
     const hash = bcrypt.hashSync(data.leaderPassword, 10);
 
     const payload = {
-      category: data.category,
-      teamName: data.teamName,
-      institution: data.institution,
-      leaderName: data.leaderName,
-      leaderNim: data.leaderNim,
-      leaderWa: data.leaderWa,
-      leaderEmail: data.leaderEmail,
+      category: data.category.trim(),
+      teamName: data.teamName.trim(),
+      institution: data.institution.trim(),
+      leaderName: data.leaderName.trim(),
+      leaderNim: data.leaderNim.trim(),
+      leaderWa: data.leaderWa.trim(),
+      leaderEmail: data.leaderEmail.trim(),
       leaderPassword: hash,
       member1Name: data.member1Name || "",
       member1Nim: data.member1Nim || "",

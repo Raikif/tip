@@ -70,7 +70,7 @@ export default function AdminVerifikasiPage() {
                   >
                     <td className="p-4">
                       <Link
-                        href={`/dashboard/teams/${team.teamName}`}
+                        href={`/dashboard/teams/${encodeURIComponent(team.teamName)}`}
                         className="font-bold hover:text-yellow-300 transition-colors"
                       >
                         {team.teamName}

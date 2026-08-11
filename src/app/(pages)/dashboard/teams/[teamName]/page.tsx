@@ -23,30 +23,49 @@ export default function AdminTeamDetailPage() {
   useEffect(() => {
     async function load() {
       if (!teamName) return;
-      const { getAllTeams } = await import("@/app/lib/action/users");
-      const all = await getAllTeams();
-      const found = all.find((t: any) => t.teamName === teamName);
-      setTeam(found || null);
+      try {
+        const { getTeamByTeamName } = await import("@/app/lib/action/users");
+        const found = await getTeamByTeamName(teamName);
+        setTeam(found || null);
+      } catch {
+        setErr("Gagal memuat data tim.");
+      }
     }
     load();
   }, [teamName]);
 
   const handleVerify = async (status: "verified" | "rejected") => {
-    const { updateTeamStatus } = await import("@/app/lib/action/users");
-    const res = await updateTeamStatus(teamName, status);
-    if (res.ok) {
-      setTeam((prev: any) => ({ ...prev, status }));
-      setActionMsg(
-        status === "verified" ? "Tim telah diverifikasi." : "Tim ditolak.",
-      );
-      setTimeout(() => setActionMsg(""), 3000);
+    setErr("");
+    setActionMsg("");
+    try {
+      if (!team?.id) {
+        setErr("Data tim tidak valid.");
+        return;
+      }
+      const { updateTeamStatus } = await import("@/app/lib/action/users");
+      const res = await updateTeamStatus(team.id, status);
+      if (res.ok) {
+        setTeam((prev: any) => ({ ...prev, status }));
+        setActionMsg(
+          status === "verified" ? "Tim telah diverifikasi." : "Tim ditolak.",
+        );
+        setTimeout(() => setActionMsg(""), 3000);
+      } else {
+        setErr(res.error || "Gagal memperbarui status tim.");
+      }
+    } catch {
+      setErr("Terjadi kesalahan server saat verifikasi.");
     }
   };
 
   async function handleDelete() {
+    if (!team?.id) {
+      setErr("Data tim tidak valid.");
+      return;
+    }
     if (
       !confirm(
-        `Hapus tim "${teamName}"? Data yang dihapus tidak dapat dikembalikan dan peserta dapat mendaftar ulang dengan IP yang sama.`,
+        `Hapus tim "${team.teamName || team.id}"? Data yang dihapus tidak dapat dikembalikan dan peserta dapat mendaftar ulang dengan IP yang sama.`,
       )
     )
       return;
@@ -54,9 +73,9 @@ export default function AdminTeamDetailPage() {
     setActionMsg("");
     try {
       const { deleteTeam } = await import("@/app/lib/action/users");
-      const res = await deleteTeam(teamName);
+      const res = await deleteTeam(team.id);
       if (res.ok) {
-        setActionMsg(`Tim "${teamName}" berhasil dihapus. Mengalihkan...`);
+        setActionMsg(`Tim "${team.teamName || team.id}" berhasil dihapus. Mengalihkan...`);
         setTimeout(() => {
           window.location.href = "/dashboard/teams";
         }, 1200);
@@ -330,7 +349,7 @@ export default function AdminTeamDetailPage() {
 
       <div className="flex flex-wrap gap-3 pt-2">
         <Link
-          href={`/dashboard/teams/${encodeURIComponent(teamName)}/edit`}
+          href={`/dashboard/teams/${encodeURIComponent(team.id)}/edit`}
           className="flex items-center gap-2 px-5 py-2.5 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 text-blue-300 font-bold rounded-[1rem] transition-all"
         >
           <Pencil size={18} />
