@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Search, Filter, Pencil, Trash2 } from "lucide-react";
+import { Search, Filter, Pencil, Trash2, Download } from "lucide-react";
 
 export default function AdminTeamsPage() {
   const [teams, setTeams] = useState<any[]>([]);
@@ -59,6 +59,25 @@ export default function AdminTeamsPage() {
     }
   }
 
+  async function handleExport() {
+    try {
+      const res = await fetch("/api/teams/export");
+      if (!res.ok) throw new Error("Gagal mengexport data.");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const timestamp = new Date().toISOString().slice(0, 10);
+      a.download = `data-tim-${timestamp}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch {
+      setActionErr("Gagal mengexport data. Pastikan Anda sudah login sebagai admin.");
+    }
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-300 drop-shadow-md pb-1">
@@ -103,6 +122,13 @@ export default function AdminTeamsPage() {
           <option value="verified" className="text-slate-900">Verified</option>
           <option value="rejected" className="text-slate-900">Rejected</option>
         </select>
+        <button
+          onClick={handleExport}
+          className="h-12 px-6 rounded-[1rem] bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 text-green-300 font-bold flex items-center gap-2 transition-all"
+        >
+          <Download size={18} />
+          Export CSV
+        </button>
       </div>
 
       <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[1.5rem] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
