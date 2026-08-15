@@ -2,15 +2,31 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Search, Filter, Pencil, Trash2, Download } from "lucide-react";
+import { Search, Pencil, Trash2, Download, CheckSquare, Square, X, ChevronDown, ExternalLink } from "lucide-react";
+import type { TeamData } from "@/app/lib/action/users";
+
+type TeamStatus = "pending" | "verified" | "fullpaper" | "ppt" | "rejected";
+
+const STATUS_OPTIONS: { value: TeamStatus; label: string }[] = [
+  { value: "pending", label: "Pending" },
+  { value: "verified", label: "Terverifikasi" },
+  { value: "fullpaper", label: "Lolos Fullpaper" },
+  { value: "ppt", label: "Masuk Final" },
+  { value: "rejected", label: "Ditolak" },
+];
 
 export default function AdminTeamsPage() {
-  const [teams, setTeams] = useState<any[]>([]);
+  const [teams, setTeams] = useState<TeamData[]>([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [actionMsg, setActionMsg] = useState("");
   const [actionErr, setActionErr] = useState("");
   const [loadErr, setLoadErr] = useState<string | null>(null);
+
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkStatus, setBulkStatus] = useState<TeamStatus>("verified");
+  const [isApplying, setIsApplying] = useState(false);
+  const [bulkResult, setBulkResult] = useState<{ succeeded: number; failed: number; errors: string[] } | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -34,11 +50,51 @@ export default function AdminTeamsPage() {
     return matchSearch && matchFilter;
   });
 
+  const allFilteredSelected = filtered.length > 0 && filtered.every((t) => selectedIds.has(t.id));
+  const someFilteredSelected = filtered.some((t) => selectedIds.has(t.id)) && !allFilteredSelected;
+
   const statusColor: Record<string, string> = {
     pending: "text-yellow-300 bg-yellow-500/20 border-yellow-400/30",
     verified: "text-green-300 bg-green-500/20 border-green-400/30",
     rejected: "text-red-300 bg-red-500/20 border-red-400/30",
+    fullpaper: "text-blue-300 bg-blue-500/20 border-blue-400/30",
+    ppt: "text-purple-300 bg-purple-500/20 border-purple-400/30",
   };
+
+  function toggleSelect(teamId: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(teamId)) {
+        next.delete(teamId);
+      } else {
+        next.add(teamId);
+      }
+      return next;
+    });
+    setBulkResult(null);
+  }
+
+  function toggleSelectAll() {
+    if (allFilteredSelected) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        filtered.forEach((t) => next.delete(t.id));
+        return next;
+      });
+    } else {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        filtered.forEach((t) => next.add(t.id));
+        return next;
+      });
+    }
+    setBulkResult(null);
+  }
+
+  function clearSelection() {
+    setSelectedIds(new Set());
+    setBulkResult(null);
+  }
 
   async function handleDelete(teamName: string) {
     if (!confirm(`Hapus tim "${teamName}"? Data yang dihapus tidak dapat dikembalikan.`)) return;
@@ -56,6 +112,49 @@ export default function AdminTeamsPage() {
       }
     } catch {
       setActionErr("Terjadi kesalahan server.");
+    }
+  }
+
+  async function handleBulkUpdate() {
+    if (selectedIds.size === 0) return;
+    setIsApplying(true);
+    setActionErr("");
+    setActionMsg("");
+    setBulkResult(null);
+    try {
+      const res = await fetch("/api/teams/bulk-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          teamIds: Array.from(selectedIds),
+          status: bulkStatus,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setActionErr(data.error || "Gagal memperbarui status.");
+        return;
+      }
+      setBulkResult({
+        succeeded: data.summary.succeeded,
+        failed: data.summary.failed,
+        errors: data.errors || [],
+      });
+      setActionMsg(`Berhasil memperbarui ${data.summary.succeeded} tim.`);
+      setTimeout(() => setActionMsg(""), 3000);
+      setTeams((prev) =>
+        prev.map((t) => {
+          if (!selectedIds.has(t.id)) return t;
+          const result = data.results?.find((r: { teamId: string; ok: boolean }) => r.teamId === t.id);
+          if (result?.ok) return { ...t, status: bulkStatus };
+          return t;
+        })
+      );
+      setSelectedIds(new Set());
+    } catch {
+      setActionErr("Terjadi kesalahan server.");
+    } finally {
+      setIsApplying(false);
     }
   }
 
@@ -119,8 +218,10 @@ export default function AdminTeamsPage() {
         >
           <option value="all" className="text-slate-900">Semua Status</option>
           <option value="pending" className="text-slate-900">Pending</option>
-          <option value="verified" className="text-slate-900">Verified</option>
-          <option value="rejected" className="text-slate-900">Rejected</option>
+          <option value="verified" className="text-slate-900">Terverifikasi</option>
+          <option value="fullpaper" className="text-slate-900">Lolos Fullpaper</option>
+          <option value="ppt" className="text-slate-900">Masuk Final</option>
+          <option value="rejected" className="text-slate-900">Ditolak</option>
         </select>
         <button
           onClick={handleExport}
@@ -131,63 +232,151 @@ export default function AdminTeamsPage() {
         </button>
       </div>
 
+      {selectedIds.size > 0 && (
+        <div className="sticky top-4 z-30 bg-white/15 backdrop-blur-xl border border-white/25 rounded-[1.5rem] p-4 shadow-[0_8px_30px_rgba(0,0,0,0.25)]">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex items-center gap-3 flex-1">
+              <span className="text-white font-bold text-sm whitespace-nowrap">
+                {selectedIds.size} tim dipilih
+              </span>
+              <button
+                onClick={clearSelection}
+                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 transition-all"
+                title="Batalkan pilihan"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="relative">
+                <select
+                  value={bulkStatus}
+                  onChange={(e) => setBulkStatus(e.target.value as TeamStatus)}
+                  className="h-10 pl-3 pr-8 rounded-xl bg-white/10 border border-white/20 text-white backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20 cursor-pointer text-sm appearance-none"
+                >
+                  {STATUS_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value} className="text-slate-900">
+                      Ubah ke: {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/50 pointer-events-none" size={14} />
+              </div>
+              <button
+                onClick={handleBulkUpdate}
+                disabled={isApplying}
+                className="h-10 px-5 rounded-xl bg-brand-purple hover:bg-brand-purple-dark disabled:opacity-60 text-white font-bold text-sm transition-all flex items-center justify-center gap-2"
+              >
+                {isApplying ? "Menyimpan..." : "Terapkan"}
+              </button>
+            </div>
+          </div>
+          {bulkResult && (
+            <div className="mt-3 text-xs font-medium text-white/80 space-y-1">
+              <p>
+                Berhasil: <span className="text-green-300">{bulkResult.succeeded}</span> &middot;{" "}
+                Gagal: <span className="text-red-300">{bulkResult.failed}</span>
+              </p>
+              {bulkResult.errors.length > 0 && (
+                <ul className="list-disc list-inside text-red-200/90 space-y-0.5">
+                  {bulkResult.errors.map((err, idx) => (
+                    <li key={idx}>{err}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[1.5rem] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
         <div className="overflow-x-auto">
-          <table className="w-full text-white">
+          <table className="w-full text-white text-sm">
             <thead>
               <tr className="border-b border-white/20 bg-white/5">
-                <th className="text-left p-4 font-bold text-sm text-white/70">Tim</th>
-                <th className="text-left p-4 font-bold text-sm text-white/70">Kategori</th>
-                <th className="text-left p-4 font-bold text-sm text-white/70 hidden md:table-cell">Instansi</th>
-                <th className="text-left p-4 font-bold text-sm text-white/70 hidden lg:table-cell">Email</th>
-                <th className="text-left p-4 font-bold text-sm text-white/70">Status</th>
-                <th className="text-right p-4 font-bold text-sm text-white/70">Aksi</th>
+                <th className="text-left p-3 w-10">
+                  <button
+                    onClick={toggleSelectAll}
+                    className="text-white/70 hover:text-white transition-colors"
+                    title={allFilteredSelected ? "Batalkan semua" : "Pilih semua yang terlihat"}
+                  >
+                    {allFilteredSelected ? (
+                      <CheckSquare size={16} />
+                    ) : someFilteredSelected ? (
+                      <CheckSquare size={16} className="text-white/50" />
+                    ) : (
+                      <Square size={16} />
+                    )}
+                  </button>
+                </th>
+                <th className="text-left p-3 font-bold text-xs text-white/70">Tim</th>
+                <th className="text-left p-3 font-bold text-xs text-white/70">Kategori</th>
+                <th className="text-left p-3 font-bold text-xs text-white/70 hidden md:table-cell">Instansi</th>
+                <th className="text-left p-3 font-bold text-xs text-white/70 hidden lg:table-cell">Email</th>
+                <th className="text-left p-3 font-bold text-xs text-white/70">Status</th>
+                <th className="text-right p-3 font-bold text-xs text-white/70">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-white/50">
+                  <td colSpan={7} className="p-6 text-center text-white/50">
                     Tidak ada data tim.
                   </td>
                 </tr>
               )}
-              {filtered.map((team) => (
-                <tr key={team.teamName} className="border-b border-white/10 hover:bg-white/5 transition-colors">
-                  <td className="p-4 font-bold">{team.teamName}</td>
-                  <td className="p-4 text-white/80 uppercase text-sm">{team.category}</td>
-                  <td className="p-4 text-white/70 hidden md:table-cell">{team.institution}</td>
-                  <td className="p-4 text-white/70 text-sm hidden lg:table-cell">{team.leaderEmail}</td>
-                  <td className="p-4">
-                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold border ${statusColor[team.status] || "text-white/50"}`}>
-                      {team.status || "pending"}
-                    </span>
-                  </td>
-                  <td className="p-4 text-right flex gap-2 justify-end">
-                    <Link
-                      href={`/dashboard/teams/${encodeURIComponent(team.id)}/edit`}
-                      className="p-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-300 transition-all"
-                      title="Edit"
-                    >
-                      <Pencil size={16} />
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(team.id)}
-                      className="p-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-lg text-red-300 transition-all"
-                      title="Hapus"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                    <Link
-                      href={`/dashboard/teams/${encodeURIComponent(team.id)}`}
-                      className="p-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white/70 transition-all"
-                      title="Detail"
-                    >
-                      Detail
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+              {filtered.map((team) => {
+                const isSelected = selectedIds.has(team.id);
+                return (
+                  <tr
+                    key={team.teamName}
+                    className={`border-b border-white/10 transition-colors ${
+                      isSelected ? "bg-white/10" : "hover:bg-white/5"
+                    }`}
+                  >
+                    <td className="p-3">
+                      <button
+                        onClick={() => toggleSelect(team.id)}
+                        className="text-white/70 hover:text-white transition-colors"
+                      >
+                        {isSelected ? <CheckSquare size={16} /> : <Square size={16} />}
+                      </button>
+                    </td>
+                    <td className="p-3 font-bold text-xs">{team.teamName}</td>
+                    <td className="p-3 text-white/80 uppercase text-xs">{team.category}</td>
+                    <td className="p-3 text-white/70 text-xs hidden md:table-cell">{team.institution}</td>
+                    <td className="p-3 text-white/70 text-xs hidden lg:table-cell">{team.leaderEmail}</td>
+                    <td className="p-3">
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-bold border ${statusColor[team.status || "pending"]}`}>
+                        {team.status || "pending"}
+                      </span>
+                    </td>
+                    <td className="p-3 text-right flex gap-1.5 justify-end">
+                      <Link
+                        href={`/dashboard/teams/${encodeURIComponent(team.id)}/edit`}
+                        className="p-1.5 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-md text-blue-300 transition-all"
+                        title="Edit"
+                      >
+                        <Pencil size={14} />
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(team.id)}
+                        className="p-1.5 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-md text-red-300 transition-all"
+                        title="Hapus"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                      <Link
+                        href={`/dashboard/teams/${encodeURIComponent(team.id)}`}
+                        className="p-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-md text-white/70 transition-all"
+                        title="Detail"
+                      >
+                        <ExternalLink size={14} />
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

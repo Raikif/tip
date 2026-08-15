@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { getFirebaseAdminDb } from "../server/firebase";
 import { getSession } from "../server/auth/sessions";
 import type { UserRole } from "@/app/(utils)/types/user";
+import { canAdvance, type TeamStage } from "@/app/(utils)/lib/teamStage";
 
 async function requireAdmin() {
   const cookie = await getSession();
@@ -90,17 +91,6 @@ export async function deleteUser(id: string) {
   return { ok: true };
 }
 
-export type TeamStage = "pending" | "verified" | "fullpaper" | "ppt" | "rejected";
-
-const STAGE_ORDER: TeamStage[] = ["pending", "verified", "fullpaper", "ppt"];
-
-function canAdvance(current: TeamStage, next: TeamStage): boolean {
-  if (next === "rejected") return true;
-  if (current === "rejected" && next === "verified") return true;
-  const currIdx = STAGE_ORDER.indexOf(current);
-  const nextIdx = STAGE_ORDER.indexOf(next);
-  return nextIdx === currIdx + 1;
-}
 
 export async function updateTeamStatus(
   teamId: string,
