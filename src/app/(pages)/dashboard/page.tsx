@@ -197,7 +197,7 @@ function JuriHome() {
         );
         const teams = await getTeamsWithSubmissions();
         const scored = teams.filter(
-          (t: any) => t.penilaian?.[session.user_id],
+          (t) => t.penilaian?.[session.user_id],
         );
         setStats({ total: teams.length, scored: scored.length });
       } catch {
@@ -267,40 +267,10 @@ function GuestHome({
   const category = user.category || "lkti";
   const cat = timeline?.[category as keyof typeof timeline];
 
-  const now = Date.now();
-  const [bypass, setBypass] = useState<string | null>(null);
-
-  useEffect(() => {
-    setBypass(localStorage.getItem("debug_time_bypass"));
-  }, []);
-
-  const handleBypass = (val: string | null) => {
-    if (val) {
-      localStorage.setItem("debug_time_bypass", val);
-    } else {
-      localStorage.removeItem("debug_time_bypass");
-    }
-    setBypass(val);
-    window.location.reload();
-  };
-
-  function hasTimePassed(time?: number | string, stageVal?: string): boolean {
-    if (bypass) {
-      if (bypass === "2") return true;
-      if (bypass === "1" && stageVal === "1") return true;
-      return false;
-    }
-    if (!time) return false;
-    const timeNum = typeof time === "string" ? new Date(time).getTime() : time;
-    return now >= timeNum;
-  }
-
-  const abstrakAnnounce = cat?.pengumuman_abstrak?.time;
-  const fullpaperAnnounce = cat?.pengumuman_fullpaper?.time;
-  const isFullpaper = hasTimePassed(abstrakAnnounce, "1");
-  const isFinal = hasTimePassed(fullpaperAnnounce, "2");
   const isPoster = category === "poster";
-  const isVerified = user.team_status === "verified";
+  const isVerified = user.team_status === "verified" || user.team_status === "fullpaper" || user.team_status === "ppt";
+  const isFullpaper = user.team_status === "fullpaper" || user.team_status === "ppt";
+  const isFinal = user.team_status === "ppt";
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-entrance relative z-10">

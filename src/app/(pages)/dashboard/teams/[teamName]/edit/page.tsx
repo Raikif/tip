@@ -13,8 +13,10 @@ const CATEGORIES = [
 
 const STATUS_OPTIONS = [
   { value: "pending", label: "Pending" },
-  { value: "verified", label: "Verified" },
-  { value: "rejected", label: "Rejected" },
+  { value: "verified", label: "Terverifikasi" },
+  { value: "fullpaper", label: "Lolos Fullpaper" },
+  { value: "ppt", label: "Masuk Final" },
+  { value: "rejected", label: "Ditolak" },
 ];
 
 export default function EditTeamPage() {

@@ -90,9 +90,21 @@ export async function deleteUser(id: string) {
   return { ok: true };
 }
 
+export type TeamStage = "pending" | "verified" | "fullpaper" | "ppt" | "rejected";
+
+const STAGE_ORDER: TeamStage[] = ["pending", "verified", "fullpaper", "ppt"];
+
+function canAdvance(current: TeamStage, next: TeamStage): boolean {
+  if (next === "rejected") return true;
+  if (current === "rejected" && next === "verified") return true;
+  const currIdx = STAGE_ORDER.indexOf(current);
+  const nextIdx = STAGE_ORDER.indexOf(next);
+  return nextIdx === currIdx + 1;
+}
+
 export async function updateTeamStatus(
   teamId: string,
-  status: "pending" | "verified" | "rejected",
+  status: TeamStage,
 ) {
   try {
     const session = await requireAdmin();
@@ -102,6 +114,24 @@ export async function updateTeamStatus(
     const snapshot = await teamRef.once("value");
     if (!snapshot.exists()) {
       return { ok: false, error: "Tim tidak ditemukan." };
+    }
+
+    const current = (snapshot.val()?.status || "pending") as TeamStage;
+
+    if (status === "rejected") {
+      await teamRef.update({
+        status,
+        verifiedBy: session.user_name ?? null,
+        verifiedAt: new Date().toISOString(),
+      });
+      return { ok: true };
+    }
+
+    if (!canAdvance(current, status)) {
+      return {
+        ok: false,
+        error: `Tidak dapat memindahkan status dari "${current}" ke "${status}".`,
+      };
     }
 
     await teamRef.update({
@@ -124,7 +154,7 @@ export type TeamData = {
   teamName: string;
   status?: string;
   category?: string;
-  [key: string]: any;
+  [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
 export async function getAllTeams(): Promise<TeamData[]> {
@@ -132,7 +162,7 @@ export async function getAllTeams(): Promise<TeamData[]> {
 
   const db = getFirebaseAdminDb();
   const snapshot = await db.ref("peserta").once("value");
-  const data = snapshot.val() as Record<string, any> | null;
+  const data = snapshot.val() as Record<string, any> | null; // eslint-disable-line @typescript-eslint/no-explicit-any
   const rootKeys = Object.keys(data || {});
 
   if (!data) {
@@ -141,7 +171,7 @@ export async function getAllTeams(): Promise<TeamData[]> {
   }
 
   const result: TeamData[] = Object.entries(data).map(([id, rawTeam]) => {
-    const team = rawTeam as Record<string, any>;
+    const team = rawTeam as Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
     return {
       ...team,
       id,
@@ -176,7 +206,7 @@ export async function getTeamByTeamName(
 
   const directSnapshot = await db.ref(`peserta/${teamName}`).once("value");
   if (directSnapshot.exists()) {
-    const data = directSnapshot.val() as Record<string, any>;
+    const data = directSnapshot.val() as Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
     console.log("[getTeamByTeamName] direct hit by key:", teamName);
     return {
       ...data,
@@ -189,7 +219,7 @@ export async function getTeamByTeamName(
   }
 
   const snapshot = await db.ref("peserta").once("value");
-  const data = snapshot.val() as Record<string, any> | null;
+  const data = snapshot.val() as Record<string, any> | null; // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!data) {
     console.log("[getTeamByTeamName] peserta not found");
     return null;
@@ -205,7 +235,7 @@ export async function getTeamByTeamName(
   }
 
   const [id] = entry;
-  const team = entry[1] as Record<string, any>;
+  const team = entry[1] as Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   console.log("[getTeamByTeamName] fallback hit:", id);
   return {
@@ -238,7 +268,7 @@ const TEAM_EDITABLE_FIELDS = [
 
 export async function updateTeam(
   teamId: string,
-  data: Record<string, any>,
+  data: Record<string, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
 ) {
   await requireAdmin();
 
@@ -246,7 +276,7 @@ export async function updateTeam(
   const snapshot = await db.ref(`peserta/${teamId}`).once("value");
   if (!snapshot.exists()) return { ok: false, error: "Tim tidak ditemukan" };
 
-  const updates: Record<string, any> = {};
+  const updates: Record<string, any> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
   for (const [key, value] of Object.entries(data)) {
     if ((TEAM_EDITABLE_FIELDS as readonly string[]).includes(key)) {
       updates[key] = value;
@@ -254,6 +284,17 @@ export async function updateTeam(
   }
 
   if (Object.keys(updates).length === 0) return { ok: true };
+
+  if (updates.status && typeof updates.status === "string") {
+    const current = (snapshot.val()?.status || "pending") as TeamStage;
+    const next = updates.status as TeamStage;
+    if (!canAdvance(current, next)) {
+      return {
+        ok: false,
+        error: `Tidak dapat memindahkan status dari "${current}" ke "${next}".`,
+      };
+    }
+  }
 
   await db.ref(`peserta/${teamId}`).update(updates);
   return { ok: true };

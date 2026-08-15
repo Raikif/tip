@@ -20,7 +20,6 @@ import {
   X,
 } from "lucide-react";
 import { logoutUser } from "@/app/lib/action/auth";
-import { useEventTimeline } from "@/app/(utils)/hooks/useEventTimeline";
 
 type UserData = {
   user_id: string;
@@ -29,6 +28,8 @@ type UserData = {
   category?: string;
   team_status?: string;
 };
+
+type TeamStage = "pending" | "verified" | "fullpaper" | "ppt" | "rejected";
 
 function isActive(pathname: string, target: string) {
   if (target === "/dashboard") return pathname === "/dashboard";
@@ -42,44 +43,19 @@ export default function DashboardLayout({
 }) {
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [bypass, setBypass] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const { timeline } = useEventTimeline();
 
-  const category = user?.category || "lkti";
-  const cat = timeline?.[category as keyof typeof timeline];
+  const stage = (user?.team_status || "pending") as TeamStage;
+  const isVerified = stage === "verified" || stage === "fullpaper" || stage === "ppt";
+  const isAbstrakOpen = isVerified;
+  const isFullpaperOpen = stage === "fullpaper" || stage === "ppt";
+  const isFinalOpen = stage === "ppt";
 
-  const now = Date.now();
-  function hasTimePassed(time?: number | string, stageVal?: string): boolean {
-    if (bypass) {
-      if (bypass === "2") return true;
-      if (bypass === "1" && stageVal === "1") return true;
-      return false;
-    }
-    if (!time) return false;
-    const timeNum = typeof time === "string" ? new Date(time).getTime() : time;
-    return now >= timeNum;
-  }
-
-  const abstrakAnnounce = cat?.pengumuman_abstrak?.time;
-  const fullpaperAnnounce = cat?.pengumuman_fullpaper?.time;
-  const isFullpaper = hasTimePassed(abstrakAnnounce, "1");
-  const isFinal = hasTimePassed(fullpaperAnnounce, "2");
-
-  useEffect(() => {
-    setBypass(localStorage.getItem("debug_time_bypass"));
-  }, []);
-
-  const handleBypass = (val: string | null) => {
-    if (val) {
-      localStorage.setItem("debug_time_bypass", val);
-    } else {
-      localStorage.removeItem("debug_time_bypass");
-    }
-    setBypass(val);
-    window.location.reload();
+  const handleLogout = async () => {
+    await logoutUser();
+    router.push("/login");
   };
 
   useEffect(() => {
@@ -109,12 +85,6 @@ export default function DashboardLayout({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [menuOpen]);
-
-  const handleLogout = async () => {
-    await logoutUser();
-    localStorage.removeItem("debug_time_bypass");
-    router.push("/login");
-  };
 
   const role = user?.user_role;
 
@@ -174,21 +144,20 @@ export default function DashboardLayout({
                 pathname={pathname}
                 icon={<FileText size={22} />}
                 label="Abstrak"
-                subtitle={(isFullpaper || isFinal) ? "Lolos / Disubmit" : undefined}
+                subtitle={isAbstrakOpen ? "Aktif" : undefined}
                 onNavigate={onNavigate}
               />
-              {(isFullpaper || isFinal) && (
+              {isFullpaperOpen && (
                 <NavLink
                   href="/dashboard/fullpaper"
                   pathname={pathname}
                   icon={<FilePlus size={22} />}
                   label="Fullpaper"
-                  subtitle={isFinal ? "Lolos / Disubmit" : undefined}
-                  disabled={isFinal}
+                  subtitle={isFinalOpen ? "Lolos / Disubmit" : undefined}
                   onNavigate={onNavigate}
                 />
               )}
-              {isFinal && (
+              {isFinalOpen && (
                 <NavLink
                   href="/dashboard/ppt"
                   pathname={pathname}

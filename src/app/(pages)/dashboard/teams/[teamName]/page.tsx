@@ -16,7 +16,7 @@ export default function AdminTeamDetailPage() {
   const params = useParams();
   const rawTeamName = params.teamName as string;
   const teamName = rawTeamName ? decodeURIComponent(rawTeamName) : "";
-  const [team, setTeam] = useState<any>(null);
+  const [team, setTeam] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
   const [loading, setLoading] = useState(true);
   const [actionMsg, setActionMsg] = useState("");
   const [err, setErr] = useState("");
@@ -39,7 +39,7 @@ export default function AdminTeamDetailPage() {
     load();
   }, [teamName]);
 
-  const handleVerify = async (status: "verified" | "rejected") => {
+  const handleVerify = async (status: "verified" | "rejected" | "fullpaper" | "ppt") => {
     setErr("");
     setActionMsg("");
     try {
@@ -50,7 +50,7 @@ export default function AdminTeamDetailPage() {
       const { updateTeamStatus } = await import("@/app/lib/action/users");
       const res = await updateTeamStatus(team.id, status);
       if (res.ok) {
-        setTeam((prev: any) => ({ ...prev, status }));
+        setTeam((prev: any) => ({ ...prev, status })); // eslint-disable-line @typescript-eslint/no-explicit-any
         setActionMsg(
           status === "verified" ? "Tim telah diverifikasi." : "Tim ditolak.",
         );
@@ -114,7 +114,7 @@ export default function AdminTeamDetailPage() {
     return (
       <div className="p-8 space-y-4">
         <p className="text-white/80 font-medium">
-          Tim dengan ID/URL "{teamName}" tidak ditemukan.
+          Tim dengan ID/URL &ldquo;{teamName}&rdquo; tidak ditemukan.
         </p>
         <Link
           href="/dashboard/teams"
@@ -399,8 +399,8 @@ export default function AdminTeamDetailPage() {
         </button>
       </div>
 
-      <div className="flex gap-4 pt-4">
-        {team.status === "pending" ? (
+      <div className="flex flex-wrap gap-4 pt-4">
+        {team.status === "pending" && (
           <>
             <button
               onClick={() => handleVerify("verified")}
@@ -409,7 +409,6 @@ export default function AdminTeamDetailPage() {
               <CheckCircle size={20} />
               Verifikasi
             </button>
-
             <button
               onClick={() => handleVerify("rejected")}
               className="flex items-center gap-2 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 font-bold rounded-[1rem] transition-all"
@@ -418,7 +417,48 @@ export default function AdminTeamDetailPage() {
               Tolak
             </button>
           </>
-        ) : team.status === "verified" ? (
+        )}
+        {team.status === "verified" && (
+          <>
+            {team.abstrak && (
+              <button
+                onClick={() => handleVerify("fullpaper")}
+                className="flex items-center gap-2 px-6 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/30 text-emerald-300 font-bold rounded-[1rem] transition-all"
+              >
+                <CheckCircle size={20} />
+                Lolos ke Fullpaper
+              </button>
+            )}
+            <button
+              onClick={() => handleVerify("rejected")}
+              className="flex items-center gap-2 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 font-bold rounded-[1rem] transition-all"
+            >
+              <XCircle size={20} />
+              Tolak
+            </button>
+          </>
+        )}
+        {team.status === "fullpaper" && (
+          <>
+            {team.fullpaper && (
+              <button
+                onClick={() => handleVerify("ppt")}
+                className="flex items-center gap-2 px-6 py-3 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-400/30 text-orange-300 font-bold rounded-[1rem] transition-all"
+              >
+                <CheckCircle size={20} />
+                Lolos ke Final
+              </button>
+            )}
+            <button
+              onClick={() => handleVerify("rejected")}
+              className="flex items-center gap-2 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 font-bold rounded-[1rem] transition-all"
+            >
+              <XCircle size={20} />
+              Tolak
+            </button>
+          </>
+        )}
+        {team.status === "ppt" && (
           <button
             onClick={() => handleVerify("rejected")}
             className="flex items-center gap-2 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 font-bold rounded-[1rem] transition-all"
@@ -426,13 +466,14 @@ export default function AdminTeamDetailPage() {
             <XCircle size={20} />
             Tolak
           </button>
-        ) : (
+        )}
+        {team.status === "rejected" && (
           <button
             onClick={() => handleVerify("verified")}
             className="flex items-center gap-2 px-6 py-3 bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 text-green-300 font-bold rounded-[1rem] transition-all"
           >
             <CheckCircle size={20} />
-            Verifikasi
+            Verifikasi Ulang
           </button>
         )}
       </div>
