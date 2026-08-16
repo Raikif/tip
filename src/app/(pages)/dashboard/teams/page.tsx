@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Search, Pencil, Trash2, Download, CheckSquare, Square, X, ChevronDown, ExternalLink } from "lucide-react";
 import type { TeamData } from "@/app/lib/action/users";
+import { isStage, type TeamStage } from "@/app/(utils)/lib/teamStage";
 
-type TeamStatus = "pending" | "verified" | "fullpaper" | "ppt" | "rejected";
-
-const STATUS_OPTIONS: { value: TeamStatus; label: string }[] = [
+const STATUS_OPTIONS: { value: TeamStage; label: string }[] = [
   { value: "pending", label: "Pending" },
   { value: "verified", label: "Terverifikasi" },
   { value: "fullpaper", label: "Lolos Fullpaper" },
@@ -24,7 +23,7 @@ export default function AdminTeamsPage() {
   const [loadErr, setLoadErr] = useState<string | null>(null);
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [bulkStatus, setBulkStatus] = useState<TeamStatus>("verified");
+  const [bulkStatus, setBulkStatus] = useState<TeamStage>("verified");
   const [isApplying, setIsApplying] = useState(false);
   const [bulkResult, setBulkResult] = useState<{ succeeded: number; failed: number; errors: string[] } | null>(null);
 
@@ -46,7 +45,8 @@ export default function AdminTeamsPage() {
       t.teamName?.toLowerCase().includes(search.toLowerCase()) ||
       t.leaderEmail?.toLowerCase().includes(search.toLowerCase()) ||
       t.institution?.toLowerCase().includes(search.toLowerCase());
-    const matchFilter = filter === "all" || t.status === filter;
+    const matchFilter =
+      filter === "all" || isStage((t.status as TeamStage) || "pending", filter as TeamStage);
     return matchSearch && matchFilter;
   });
 
@@ -251,7 +251,7 @@ export default function AdminTeamsPage() {
               <div className="relative">
                 <select
                   value={bulkStatus}
-                  onChange={(e) => setBulkStatus(e.target.value as TeamStatus)}
+                  onChange={(e) => setBulkStatus(e.target.value as TeamStage)}
                   className="h-10 pl-3 pr-8 rounded-xl bg-white/10 border border-white/20 text-white backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20 cursor-pointer text-sm appearance-none"
                 >
                   {STATUS_OPTIONS.map((opt) => (

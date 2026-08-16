@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEventTimeline } from "@/app/(utils)/hooks/useEventTimeline";
+import { isStage, type TeamStage } from "@/app/(utils)/lib/teamStage";
 
 function formatMs(ms: number): string {
   const d = new Date(ms);
@@ -95,8 +96,8 @@ function AdminHome() {
           poster: 0,
         };
         for (const t of teams) {
-          if (t.status === "verified") s.verified++;
-          else if (t.status === "rejected") s.rejected++;
+          if (isStage((t.status as TeamStage) || "pending", "verified")) s.verified++;
+          else if (isStage((t.status as TeamStage) || "pending", "rejected")) s.rejected++;
           else s.pending++;
           if (t.category === "lkti") s.lkti++;
           else if (t.category === "essay") s.essay++;

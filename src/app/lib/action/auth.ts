@@ -5,6 +5,7 @@ import { getFirebaseAdminDb } from "../server/firebase";
 import { createSession } from "../server/auth/sessions";
 import { loginFormSchema } from "@/app/(utils)/zod/auth";
 import { headers } from "next/headers";
+import { isStage, type TeamStage } from "@/app/(utils)/lib/teamStage";
 
 type UploadedFile = {
   url: string;
@@ -65,7 +66,7 @@ export async function loginUser(formData: FormData) {
       return { message: "Email atau password salah" };
     }
 
-    if (user.status === "rejected") {
+    if (isStage((user.status as TeamStage) || "pending", "rejected")) {
       return { message: "Tim Anda telah ditolak. Silakan hubungi panitia." };
     }
 
