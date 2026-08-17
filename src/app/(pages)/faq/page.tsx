@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { GlobalBackground } from "@/app/(utils)/components/layout/GlobalBackground";
 import "@/components/sections/FaqSection.css";
 
 type FaqItem = {
@@ -237,8 +238,18 @@ export default function FaqPage() {
   };
 
   return (
-    <section className="faq-section" id="faq">
-      <div className="faq-container">
+    <GlobalBackground>
+      <div
+        className="relative w-full pb-16"
+        style={{
+          backgroundImage: "url('/hero/background.svg')",
+          backgroundRepeat: "repeat-y",
+          backgroundSize: "100%",
+          backgroundPosition: "center",
+        }}
+      >
+        <section className="faq-section" id="faq">
+          <div className="faq-container">
         <header className="faq-header">
           <div className="faq-badge">
             <div className="faq-badge__dashed">
@@ -287,7 +298,9 @@ export default function FaqPage() {
             Kembali ke Beranda
           </Link>
         </div>
+        </div>
+      </section>
       </div>
-    </section>
+    </GlobalBackground>
   );
 }
