@@ -7,6 +7,7 @@ import { Button } from "@/app/(utils)/components/ui/Button";
 import { SubmitSuccess } from "@/app/(utils)/components/ui/SubmitSuccess";
 import { useSessionUser } from "@/app/(utils)/hooks/useSessionUser";
 import { FileDropUpload } from "@/app/(utils)/components/ui/FileDropUpload";
+import { canSubmitAbstrak, type TeamStage } from "@/app/(utils)/lib/teamStage";
 
 const THEMES: Record<string, string[]> = {
   lkti: [
@@ -28,6 +29,7 @@ const THEMES: Record<string, string[]> = {
 
 export default function AbstrakPage() {
   const user = useSessionUser();
+  const teamStatus = (user?.team_status || "pending") as TeamStage;
   const [submitted, setSubmitted] = useState(false);
   const [subtema, setSubtema] = useState("");
   const [title, setTitle] = useState("");
@@ -46,6 +48,33 @@ export default function AbstrakPage() {
     }
     loadTeam();
   }, []);
+
+  if (!user) return <div className="p-8">Memuat halaman...</div>;
+
+  const isLocked = !canSubmitAbstrak(teamStatus);
+  const isRejected = teamStatus === "rejected";
+
+  if (isRejected) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-6 animate-entrance relative z-10">
+        <div className="bg-red-500/10 border border-red-400/30 text-red-200 p-8 rounded-[1.5rem] text-center">
+          <p className="text-xl font-black mb-2">Tim Anda Ditolak</p>
+          <p className="text-white/70 text-sm font-medium">Tim Anda tidak lolos verifikasi. Silakan hubungi panitia untuk informasi lebih lanjut.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLocked) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-6 animate-entrance relative z-10">
+        <div className="bg-yellow-500/10 border border-yellow-400/30 text-yellow-200 p-8 rounded-[1.5rem] text-center">
+          <p className="text-xl font-black mb-2">Abstrak Belum Tersedia</p>
+          <p className="text-white/70 text-sm font-medium">Pengumpulan abstrak hanya dapat dilakukan setelah tim Anda terverifikasi oleh panitia.</p>
+        </div>
+      </div>
+    );
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -74,7 +103,6 @@ export default function AbstrakPage() {
     }
   }
 
-  if (!user) return <div className="p-8">Memuat halaman...</div>;
   const categories = user.category as "lkti" | "essay";
   const themesList = THEMES[categories] || [];
 

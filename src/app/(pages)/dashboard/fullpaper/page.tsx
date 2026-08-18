@@ -3,13 +3,11 @@
 import { useState, useEffect } from "react";
 import { FilePlus } from "lucide-react";
 import { useSessionUser } from "@/app/(utils)/hooks/useSessionUser";
-import { useTimeLock } from "@/app/(utils)/hooks/useTimeLock";
-import { Warnscreen } from "@/app/(utils)/components/ui/Warnscreen";
 import { SubmitSuccess } from "@/app/(utils)/components/ui/SubmitSuccess";
 import { FileDropUpload } from "@/app/(utils)/components/ui/FileDropUpload";
 import { Input } from "@/app/(utils)/components/ui/Input";
 import { Button } from "@/app/(utils)/components/ui/Button";
-import { getCurrentWaveInfo } from "@/app/(utils)/hooks/wavePricing";
+import { canSubmitFullpaper, type TeamStage } from "@/app/(utils)/lib/teamStage";
 
 const THEMES: Record<string, string[]> = {
   lkti: [
@@ -31,10 +29,7 @@ const THEMES: Record<string, string[]> = {
 
 export default function FullpaperPage() {
   const user = useSessionUser();
-  const { isLocked, lockMessage } = useTimeLock(
-    user?.category || "lkti",
-    "pengumpulan_fullpaper",
-  );
+  const teamStatus = (user?.team_status || "pending") as TeamStage;
 
   const [submitted, setSubmitted] = useState(false);
   const [subtema, setSubtema] = useState("");
@@ -55,14 +50,30 @@ export default function FullpaperPage() {
     loadTeam();
   }, []);
 
-  const waveInfo = getCurrentWaveInfo(user?.category || "lkti");
-
   if (!user) return <div className="p-8">Memuat halaman...</div>;
+
+  const isLocked = !canSubmitFullpaper(teamStatus);
+  const isRejected = teamStatus === "rejected";
+
+  if (isRejected) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-6 animate-entrance relative z-10">
+        <div className="bg-red-500/10 border border-red-400/30 text-red-200 p-8 rounded-[1.5rem] text-center">
+          <p className="text-xl font-black mb-2">Tim Anda Ditolak</p>
+          <p className="text-white/70 text-sm font-medium">Tim Anda tidak lolos verifikasi. Silakan hubungi panitia untuk informasi lebih lanjut.</p>
+        </div>
+      </div>
+    );
+  }
+
   if (isLocked) {
     return (
-      <Warnscreen title="Pengumpulan Fullpaper Dikunci">
-        {lockMessage}
-      </Warnscreen>
+      <div className="max-w-3xl mx-auto space-y-6 animate-entrance relative z-10">
+        <div className="bg-yellow-500/10 border border-yellow-400/30 text-yellow-200 p-8 rounded-[1.5rem] text-center">
+          <p className="text-xl font-black mb-2">Fullpaper Belum Tersedia</p>
+          <p className="text-white/70 text-sm font-medium">Pengumpulan fullpaper hanya dapat dilakukan setelah abstrak Anda diterima dan tim dinyatakan lolos ke tahap selanjutnya.</p>
+        </div>
+      </div>
     );
   }
 
@@ -126,20 +137,6 @@ export default function FullpaperPage() {
           <div className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
             <FileDropUpload label="Upload Lembar Orisinalitas" accept=".pdf" maxSizeMB={2} teamName={user.user_name} stage="penyisihan" onUpload={setOrisinalitas} />
             <FileDropUpload label="Upload Fullpaper" accept=".pdf" maxSizeMB={4} teamName={user.user_name} stage="penyisihan" onUpload={setFile} />
-          </div>
-
-          <div className="bg-white/5 border border-white/20 p-6 rounded-[1.2rem]">
-            <h3 className="text-lg font-bold text-white mb-4">Informasi Pembayaran ({waveInfo.waveName})</h3>
-            <p className="text-white/80 mb-2">Biaya Pendaftaran: <strong className="text-yellow-300 text-xl ml-2">{waveInfo.formattedPrice}</strong></p>
-            <div className="text-white/80 mb-4">
-              <p>Transfer ke Rekening:</p>
-              <ul className="list-disc list-inside mt-2 ml-2 space-y-1">
-                <li>Bank BRI: <strong className="text-white">3539 0104 7607 530</strong></li>
-                <li>Bank Mandiri: <strong className="text-white">1370 0261 3874 9</strong></li>
-              </ul>
-              <p className="mt-2 ml-2">an. <strong className="text-white">Ristama Simangunsong</strong></p>
-            </div>
-            <FileDropUpload label="Upload Bukti Pembayaran" accept="image/*,.pdf" maxSizeMB={2} teamName={user.user_name} stage="penyisihan" onUpload={setBuktiPembayaran} />
           </div>
 
           <div className="pt-6 border-t border-white/20 mt-8">

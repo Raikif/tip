@@ -3,19 +3,15 @@
 import { useState, useEffect } from "react";
 import { Presentation } from "lucide-react";
 import { useSessionUser } from "@/app/(utils)/hooks/useSessionUser";
-import { useTimeLock } from "@/app/(utils)/hooks/useTimeLock";
-import { Warnscreen } from "@/app/(utils)/components/ui/Warnscreen";
 import { SubmitSuccess } from "@/app/(utils)/components/ui/SubmitSuccess";
 import { FileDropUpload } from "@/app/(utils)/components/ui/FileDropUpload";
 import { Input } from "@/app/(utils)/components/ui/Input";
 import { Button } from "@/app/(utils)/components/ui/Button";
+import { canSubmitPPT, type TeamStage } from "@/app/(utils)/lib/teamStage";
 
 export default function PPTPage() {
   const user = useSessionUser();
-  const { isLocked, lockMessage } = useTimeLock(
-    user?.category || "lkti",
-    "final",
-  );
+  const teamStatus = (user?.team_status || "pending") as TeamStage;
 
   const [submitted, setSubmitted] = useState(false);
   const [link, setLink] = useState("");
@@ -34,11 +30,29 @@ export default function PPTPage() {
   }, []);
 
   if (!user) return <div className="p-8">Memuat halaman...</div>;
+
+  const isLocked = !canSubmitPPT(teamStatus);
+  const isRejected = teamStatus === "rejected";
+
+  if (isRejected) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-6 animate-entrance relative z-10">
+        <div className="bg-red-500/10 border border-red-400/30 text-red-200 p-8 rounded-[1.5rem] text-center">
+          <p className="text-xl font-black mb-2">Tim Anda Ditolak</p>
+          <p className="text-white/70 text-sm font-medium">Tim Anda tidak lolos verifikasi. Silakan hubungi panitia untuk informasi lebih lanjut.</p>
+        </div>
+      </div>
+    );
+  }
+
   if (isLocked) {
     return (
-      <Warnscreen title="Pengumpulan PPT Dikunci">
-        {lockMessage}
-      </Warnscreen>
+      <div className="max-w-3xl mx-auto space-y-6 animate-entrance relative z-10">
+        <div className="bg-yellow-500/10 border border-yellow-400/30 text-yellow-200 p-8 rounded-[1.5rem] text-center">
+          <p className="text-xl font-black mb-2">PPT Belum Tersedia</p>
+          <p className="text-white/70 text-sm font-medium">Pengumpulan PPT hanya dapat dilakukan setelah fullpaper Anda diterima dan tim dinyatakan lolos ke Grand Final.</p>
+        </div>
+      </div>
     );
   }
 
