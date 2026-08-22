@@ -119,18 +119,17 @@ export default function HeroSection() {
               className="mt-10 flex w-full max-w-2xl flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center"
             >
               <Link
-                href="/pendaftaran"
-
-                className="inline-flex w-full items-center justify-center rounded-[1.1rem] bg-[#B44DFF] px-6 py-4 text-base font-semibold text-white shadow-[0_18px_40px_rgba(116,43,171,0.38)] transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[#A343F2] sm:min-w-[15rem] sm:w-auto sm:text-lg"
-              >
-                Daftar Sekarang
-              </Link>
-
-              <Link
                 href="/login"
                 className="inline-flex w-full items-center justify-center rounded-[1.1rem] bg-[#FF6A00] px-6 py-4 text-base font-semibold text-white shadow-[0_18px_40px_rgba(168,63,0,0.34)] transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[#ff5c00] sm:min-w-[15rem] sm:w-auto sm:text-lg"
               >
-                Masuk
+                Masuk ke Dashboard
+              </Link>
+
+              <Link
+                href="/pendaftaran"
+                className="inline-flex w-full items-center justify-center rounded-[1.1rem] bg-white/20 border border-white/30 backdrop-blur-md px-6 py-4 text-base font-semibold text-white shadow-[0_18px_40px_rgba(0,0,0,0.1)] transition-transform duration-200 hover:-translate-y-0.5 hover:bg-white/30 sm:min-w-[15rem] sm:w-auto sm:text-lg"
+              >
+                Pendaftaran Ditutup
               </Link>
             </div>
           </div>

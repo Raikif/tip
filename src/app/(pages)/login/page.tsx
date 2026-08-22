@@ -120,11 +120,12 @@ export default function LoginPage() {
 
             <div className="text-center mt-6">
               <p className="text-sm text-white/70 font-medium">
+                Pendaftaran telah ditutup.{" "}
                 <Link
                   href="/pendaftaran"
-                  className="text-white font-bold hover:underline transition-colors drop-shadow-sm"
+                  className="text-yellow-300 font-bold hover:underline transition-colors drop-shadow-sm"
                 >
-                  Daftar sekarang
+                  Lihat informasi
                 </Link>
               </p>
             </div>

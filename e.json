@@ -3,7 +3,7 @@
     "lkti": {
       "pendaftaran": {
         "start": 1784611200000,
-        "end": 1788067199000,
+        "end": 1787414399000,
         "label": "Pendaftaran",
         "order": 31536000001
       },
@@ -38,7 +38,7 @@
     "essay": {
       "pendaftaran": {
         "start": 1784611200000,
-        "end": 1788067199000,
+        "end": 1787414399000,
         "label": "Pendaftaran",
         "order": 31536000001
       },
@@ -73,7 +73,7 @@
     "poster": {
       "pendaftaran": {
         "start": 1784611200000,
-        "end": 1788067199000,
+        "end": 1787414399000,
         "label": "Pendaftaran",
         "order": 31536000001
       },
